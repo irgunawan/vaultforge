@@ -130,6 +130,13 @@ namespace HermesVaultManager
                         return result;
                     }
 
+                    int jsonStart = output.IndexOf('{');
+                    int jsonEnd = output.LastIndexOf('}');
+                    if (jsonStart >= 0 && jsonEnd > jsonStart)
+                    {
+                        output = output.Substring(jsonStart, jsonEnd - jsonStart + 1);
+                    }
+
                     var parsed = _json.DeserializeObject(output) as Dictionary<string, object>;
                     if (parsed == null)
                     {
