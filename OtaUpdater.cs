@@ -107,7 +107,10 @@ namespace VaultForge
                 "$log = '" + Ps(log) + "'\r\n" +
                 "$deadline = (Get-Date).AddMinutes(2)\r\n" +
                 "while ((Get-Process -Id $appPid -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline) { Start-Sleep -Milliseconds 250 }\r\n" +
-                "$p = Start-Process -FilePath \"$env:SystemRoot\\System32\\msiexec.exe\" -ArgumentList @('/i', \"`\"$msi`\"\", '/quiet', '/norestart', '/log', \"`\"$log`\"\") -Wait -PassThru\r\n" +
+                "$keys = @('HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*', 'HKLM:\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*')\r\n" +
+                "$old = Get-ItemProperty $keys -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -eq 'VaultForge' } | Select-Object -First 1 -ExpandProperty PSChildName\r\n" +
+                "if ($old) { Start-Process -FilePath \"$env:SystemRoot\\System32\\msiexec.exe\" -ArgumentList @('/x', $old, '/quiet', '/norestart') -Wait }\r\n" +
+                "$p = Start-Process -FilePath \"$env:SystemRoot\\System32\\msiexec.exe\" -ArgumentList @('/i', $msi, '/quiet', '/norestart', '/log', $log) -Wait -PassThru\r\n" +
                 "if ($p.ExitCode -eq 0 -and (Test-Path $exe)) { Start-Process -FilePath $exe }\r\n";
             File.WriteAllText(path, script, new System.Text.UTF8Encoding(false));
             return path;
