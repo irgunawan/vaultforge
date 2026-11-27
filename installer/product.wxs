@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Hermes Vault Manager" Language="1033" Version="1.0.0"
+           Manufacturer="irgun.web.id" UpgradeCode="799C6EB4-A5CE-4318-8FBF-3E484755952E">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
+    <MajorUpgrade DowngradeErrorMessage="Versi Hermes Vault Manager yang lebih baru sudah terpasang."/>
+    <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+
+    <Icon Id="AppIcon" SourceFile="app.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="AppIcon"/>
+    <Property Id="ARPHELPLINK" Value="https://github.com/irgunawan/hermes-vault-manager"/>
+    <Property Id="ARPNOREPAIR" Value="1"/>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLDIR" Name="Hermes Vault Manager">
+          <Component Id="MainExe" Guid="7777409D-AAE5-4064-BFD7-9DA4315F6C87" Win64="no">
+            <File Id="MainExeFile" Source="publish/HermesVaultManager.exe" KeyPath="yes">
+              <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuDir" Name="Hermes Vault Manager" WorkingDirectory="INSTALLDIR" Icon="AppIcon" Advertise="yes"/>
+              <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="Hermes Vault Manager" WorkingDirectory="INSTALLDIR" Icon="AppIcon" Advertise="yes"/>
+            </File>
+          </Component>
+          <Component Id="ConfigFile" Guid="0048A7CF-5120-4782-855A-CB269C5D7E99" Win64="no">
+            <File Id="ConfigFileFile" Source="publish/HermesVaultManager.exe.config" KeyPath="yes"/>
+          </Component>
+          <Component Id="BridgeScript" Guid="10F2705B-D379-4268-A94E-B7DBC52D715D" Win64="no">
+            <File Id="BridgeScriptFile" Source="publish/vault_bridge.ps1" KeyPath="yes"/>
+          </Component>
+          <Component Id="HelperScript" Guid="F03E4223-78A3-4327-8C68-98FB898320CB" Win64="no">
+            <File Id="HelperScriptFile" Source="publish/vault_helper.py" KeyPath="yes"/>
+          </Component>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ProgramMenuDir" Name="Hermes Vault Manager"/>
+      </Directory>
+      <Directory Id="DesktopFolder"/>
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Hermes Vault Manager" Level="1">
+      <ComponentRef Id="MainExe"/>
+      <ComponentRef Id="ConfigFile"/>
+      <ComponentRef Id="BridgeScript"/>
+      <ComponentRef Id="HelperScript"/>
+    </Feature>
+  </Product>
+</Wix>

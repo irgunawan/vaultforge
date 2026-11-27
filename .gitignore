@@ -1,0 +1,8 @@
+bin/
+obj/
+publish/
+*.msi
+*.wixobj
+*.wixpdb
+*.user
+.vs/
