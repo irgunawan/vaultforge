@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>VaultForge — mockup native Windows 10</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 12px; color: #000;
+    background: linear-gradient(135deg, #0078d4 0%, #0063b1 45%, #004578 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding-bottom: 46px;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 70% 28%, rgba(255,255,255,.18), transparent 55%);
+  }
+
+  .window {
+    width: 1120px; height: 720px; background: #f3f3f3;
+    border: 1px solid #7a7a7a; box-shadow: 0 14px 44px rgba(0,0,0,.38);
+    display: flex; flex-direction: column; position: relative; z-index: 1;
+  }
+
+  .titlebar {
+    height: 32px; flex: none; display: flex; align-items: center;
+    background: #fff; border-bottom: 1px solid #d9d9d9; padding-left: 8px;
+  }
+  .titlebar .name { font-size: 12px; }
+  .titlebar .spacer { flex: 1; }
+  .wbtn { width: 45px; height: 30px; display: grid; place-items: center; font-size: 11px; }
+  .wbtn:hover { background: #e5e5e5; }
+  .wbtn.close:hover { background: #e81123; color: #fff; }
+
+  .menubar {
+    height: 26px; flex: none; display: flex; align-items: center;
+    background: #f3f3f3; border-bottom: 1px solid #d9d9d9; padding-left: 6px;
+  }
+  .menubar span { padding: 4px 10px; }
+  .menubar span:hover { background: #e5e5e5; outline: 1px solid #ccc; }
+
+  .banner {
+    flex: none; background: #deecf9; border-bottom: 1px solid #b4d6f7;
+    padding: 6px 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .banner .txt { flex: 1; color: #0c3b5e; }
+
+  .btn {
+    height: 26px; min-width: 78px; padding: 0 12px;
+    background: #cccccc; border: 1px solid #7a7a7a; border-radius: 2px;
+    font-family: inherit; font-size: 12px; color: #000;
+    display: inline-grid; place-items: center;
+  }
+  .btn:hover { background: #e6f2fb; border-color: #0078d7; }
+  .btn.default { outline: 1px solid #0078d7; outline-offset: 1px; }
+
+  .content {
+    flex: 1; min-height: 0; display: grid;
+    grid-template-columns: 360px 1fr; gap: 12px; padding: 12px;
+  }
+  .left { display: flex; flex-direction: column; }
+  fieldset.group {
+    border: 1px solid #d0d0d0; margin: 0; padding: 10px 12px 12px; background: #f3f3f3;
+  }
+  fieldset.group legend { padding: 0 4px; font-size: 12px; }
+  .field { margin-bottom: 8px; }
+  .field label { display: block; margin-bottom: 2px; }
+  .input {
+    height: 23px; background: #fff; border: 1px solid #7a7a7a;
+    padding: 2px 4px; font-family: inherit; font-size: 12px; display: flex; align-items: center;
+  }
+  .input.ph { color: #767676; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .actions { display: flex; gap: 8px; margin-top: 6px; }
+  .hint { color: #595959; font-size: 11px; line-height: 1.4; margin-top: 10px; }
+
+  .right { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .gridtools {
+    background: #f3f3f3; border: 1px solid #d0d0d0; border-bottom: 0;
+    padding: 4px 6px; display: flex; gap: 6px;
+  }
+  .gridtools .btn { height: 22px; min-width: 74px; font-size: 11px; }
+  .gridwrap {
+    flex: 1; min-height: 0; border: 1px solid #d0d0d0; background: #fff;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .cols { display: grid; grid-template-columns: 1.2fr .55fr 1.05fr .95fr 1.35fr; }
+  .gridhead { background: #f0f0f0; border-bottom: 1px solid #d0d0d0; }
+  .gridhead div, .gridrow div {
+    padding: 4px 6px; border-right: 1px solid #e5e5e5;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .gridrow { border-bottom: 1px solid #eee; font-size: 11px; }
+  .gridrow.sel { background: #cce8ff; }
+  .gridrow:hover:not(.sel) { background: #f5faff; }
+
+  .proc { border: 1px solid #d0d0d0; background: #f3f3f3; padding: 8px 12px 10px; }
+  .proc .hd { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .proc .hd span { color: #595959; font-size: 11px; }
+  .gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .gauge { display: flex; align-items: center; gap: 10px; border: 1px solid #d0d0d0; background: #fff; padding: 8px; }
+  .dial {
+    width: 56px; height: 56px; border-radius: 50%; background: #fff;
+    border: 1px solid #7a7a7a; position: relative; flex: none;
+  }
+  .dial::after {
+    content: ""; position: absolute; left: calc(50% - 1px); bottom: 50%;
+    width: 2px; height: 20px; background: #0078d7;
+    transform-origin: bottom center; transform: rotate(var(--a));
+  }
+  .dial b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; }
+  .gmeta { min-width: 0; flex: 1; }
+  .gmeta b { display: block; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gmeta span { color: #595959; font-size: 10px; }
+  .bar { height: 4px; background: #e5e5e5; margin-top: 5px; }
+  .bar i { display: block; height: 100%; width: var(--v); background: #0078d7; }
+
+  .status {
+    height: 24px; flex: none; background: #f0f0f0; border-top: 1px solid #d0d0d0;
+    display: flex; align-items: center; padding: 0 10px; gap: 10px; font-size: 11px;
+  }
+  .status .right { margin-left: auto; color: #595959; }
+
+  .taskbar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 40px; z-index: 2;
+    background: #c8c8c8; border-top: 1px solid #fff;
+    display: flex; align-items: center; padding: 0 8px; gap: 10px;
+  }
+  .tbicon {
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border-bottom: 2px solid #0078d7;
+  }
+  .tbstart { font-size: 13px; padding: 6px 10px; }
+  .tbclock { margin-left: auto; font-size: 11px; padding-right: 8px; }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <svg width="16" height="16" viewBox="0 0 32 32" aria-label="anvil">
+      <path d="M2 12 L8 10 L24 10 L29 13 L24 14 L24 16 L27 17 L27 19 L20 19 L20 25 L9 25 L9 19 L5 19 L5 16 L9 14 L2 14 Z" fill="#3b3b3b" stroke="#1a1a1a" stroke-width="1"/>
+      <path d="M2 12 L8 10 L24 10 L29 13 L2 13 Z" fill="#707070"/>
+    </svg>
+    <span class="name">VaultForge</span>
+    <div class="spacer"></div>
+    <div class="wbtn">&#9472;</div><div class="wbtn">&#9633;</div><div class="wbtn close">&#10005;</div>
+  </div>
+
+  <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Settings</span><span>Help</span></div>
+
+  <div class="banner">
+    <span class="txt">Update v1.0.2 tersedia &mdash; pasang otomatis lewat OTA.</span>
+    <button class="btn default">UPDATE OTA</button>
+    <button class="btn">UNDUH</button>
+  </div>
+
+  <div class="content">
+    <div class="left">
+      <fieldset class="group">
+        <legend>Tambah Login</legend>
+        <div class="field"><label>Label</label><div class="input">GitHub work account</div></div>
+        <div class="field"><label>Site origin</label><div class="input">https://github.com</div></div>
+        <div class="row2">
+          <div class="field"><label>Identifier type</label><div class="input">email</div></div>
+          <div class="field"><label>Identifier</label><div class="input">irgunawan@&hellip;</div></div>
+        </div>
+        <div class="field"><label>Password</label><div class="input">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</div></div>
+        <div class="field"><label>Authenticator key (opsional)</label><div class="input ph">otpauth:// atau seed base32</div></div>
+        <div class="actions"><button class="btn default">SIMPAN</button><button class="btn">BERSIHKAN</button></div>
+        <div class="hint">Password tidak pernah ditampilkan lagi. Vault memakai kunci lokal Hermes.</div>
+      </fieldset>
+    </div>
+
+    <div class="right">
+      <div class="gridtools">
+        <button class="btn">REFRESH</button><button class="btn">HAPUS</button><button class="btn">CEK UPDATE</button>
+      </div>
+      <div class="gridwrap">
+        <div class="gridhead cols">
+          <div>Handle</div><div>Kind</div><div>Label</div><div>Identifier</div><div>Origin</div>
+        </div>
+        <div class="gridrow cols sel"><div>vault_d91242573621</div><div>login</div><div>webminsmd</div><div>irgunawan</div><div>https://webadmin.pocindonesia.com</div></div>
+        <div class="gridrow cols"><div>vault_d2ac1fe08762</div><div>login</div><div>portalpoc</div><div>OC62IRG</div><div>https://portal.pocindonesia.web.id</div></div>
+        <div class="gridrow cols"><div>vault_604833120d33</div><div>login</div><div>PMA</div><div>root</div><div>https://pma.pocindonesia.com</div></div>
+        <div class="gridrow cols"><div>vault_2a2ffc91c045</div><div>login</div><div>portalMEL</div><div>OC62MEL</div><div>https://portal.pocindonesia.web.id</div></div>
+        <div class="gridrow cols"><div>vault_58debfdf02b4</div><div>login</div><div>PortalIrgun</div><div>OC62IRG</div><div>https://portal.irgun.web.id</div></div>
+        <div class="gridrow cols"><div>vault_631d93279178</div><div>login</div><div>spacehost</div><div>indonesiapoc9@gmail.com</div><div>https://ai.spacehost.co.id</div></div>
+      </div>
+
+      <div class="proc">
+        <div class="hd"><b>Proses terberat</b><span>saat Hermes bekerja &middot; 3 proses CPU tertinggi</span></div>
+        <div class="gauges">
+          <div class="gauge" style="--v:42%">
+            <div class="dial" style="--a:-19deg"><b>42</b></div>
+            <div class="gmeta"><b>hermes-gateway</b><span>PID 4182 &middot; RAM 318 MB</span><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:23%">
+            <div class="dial" style="--a:-65deg"><b>23</b></div>
+            <div class="gmeta"><b>chromium</b><span>PID 5127 &middot; RAM 604 MB</span><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:18%">
+            <div class="dial" style="--a:-77deg"><b>18</b></div>
+            <div class="gmeta"><b>python</b><span>PID 6071 &middot; RAM 96 MB</span><div class="bar"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status"><span>Vault siap &middot; PowerShell bridge terhubung</span><span class="right">v1.0.2 &middot; irgun.web.id</span></div>
+</div>
+
+<div class="taskbar">
+  <div class="tbstart">&#9654; Start</div>
+  <div class="tbicon" title="VaultForge">
+    <svg width="24" height="24" viewBox="0 0 32 32">
+      <path d="M2 12 L8 10 L24 10 L29 13 L24 14 L24 16 L27 17 L27 19 L20 19 L20 25 L9 25 L9 19 L5 19 L5 16 L9 14 L2 14 Z" fill="#3b3b3b" stroke="#1a1a1a" stroke-width="1"/>
+      <path d="M2 12 L8 10 L24 10 L29 13 L2 13 Z" fill="#707070"/>
+    </svg>
+  </div>
+  <div class="tbclock">15:42 &nbsp; 28/11/2026</div>
+</div>
+
+</body>
+</html>

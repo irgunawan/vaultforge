@@ -1,23 +1,27 @@
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace VaultForge
 {
     internal static class Theme
     {
-        public static readonly Color Bg = Color.FromArgb(11, 17, 32);
-        public static readonly Color Surface = Color.FromArgb(17, 24, 39);
-        public static readonly Color Surface2 = Color.FromArgb(30, 41, 59);
-        public static readonly Color Border = Color.FromArgb(36, 50, 68);
-        public static readonly Color Text = Color.FromArgb(226, 232, 240);
-        public static readonly Color Muted = Color.FromArgb(148, 163, 184);
-        public static readonly Color Accent = Color.FromArgb(16, 185, 129);
-        public static readonly Color AccentDark = Color.FromArgb(5, 150, 105);
-        public static readonly Color Purple = Color.FromArgb(124, 58, 237);
-        public static readonly Color Danger = Color.FromArgb(239, 68, 68);
-        public static readonly Color Warning = Color.FromArgb(245, 158, 11);
+        public static bool Dark { get; private set; }
+
+        public static Color Bg { get { return Dark ? Color.FromArgb(32, 32, 32) : SystemColors.Control; } }
+        public static Color Surface { get { return Dark ? Color.FromArgb(45, 45, 45) : Color.White; } }
+        public static Color Surface2 { get { return Dark ? Color.FromArgb(55, 55, 55) : Color.FromArgb(240, 240, 240); } }
+        public static Color Border { get { return Dark ? Color.FromArgb(82, 82, 82) : Color.FromArgb(208, 208, 208); } }
+        public static Color Text { get { return Dark ? Color.FromArgb(235, 235, 235) : Color.Black; } }
+        public static Color Muted { get { return Dark ? Color.FromArgb(165, 165, 165) : Color.FromArgb(89, 89, 89); } }
+        public static Color Accent { get { return Dark ? Color.FromArgb(86, 166, 245) : Color.FromArgb(0, 120, 215); } }
+        public static Color AccentDark { get { return Dark ? Color.FromArgb(58, 130, 205) : Color.FromArgb(0, 99, 177); } }
+        public static Color Purple { get { return Accent; } }
+        public static Color Danger { get { return Dark ? Color.FromArgb(255, 110, 110) : Color.FromArgb(232, 17, 35); } }
+        public static Color Warning { get { return Dark ? Color.FromArgb(240, 175, 70) : Color.FromArgb(204, 102, 0); } }
+        public static Color ButtonFace { get { return Dark ? Color.FromArgb(62, 62, 62) : Color.FromArgb(204, 204, 204); } }
+        public static Color BannerBg { get { return Dark ? Color.FromArgb(26, 55, 76) : Color.FromArgb(222, 236, 249); } }
+        public static Color BannerText { get { return Dark ? Color.FromArgb(190, 222, 247) : Color.FromArgb(12, 59, 94); } }
 
         public static Font Ui(float size, FontStyle style = FontStyle.Regular)
         {
@@ -29,27 +33,82 @@ namespace VaultForge
             return new Font("Consolas", size, style, GraphicsUnit.Point);
         }
 
-        public static GraphicsPath Rounded(Rectangle r, int radius)
+        public static void SetDark(bool dark)
         {
-            int d = Math.Max(2, radius * 2);
-            var p = new GraphicsPath();
-            p.AddArc(r.X, r.Y, d, d, 180, 90);
-            p.AddArc(r.Right - d, r.Y, d, d, 270, 90);
-            p.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
-            p.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
-            p.CloseFigure();
-            return p;
+            Dark = dark;
         }
 
         public static void StyleTextBox(TextBox t)
         {
-            t.BackColor = Color.FromArgb(15, 23, 42);
+            t.BackColor = Dark ? Color.FromArgb(51, 51, 51) : Color.White;
             t.ForeColor = Text;
             t.BorderStyle = BorderStyle.FixedSingle;
-            t.Font = Ui(10f);
+            t.Font = Ui(9f);
+        }
+
+        public static void StyleGrid(DataGridView grid)
+        {
+            grid.BackgroundColor = Dark ? Color.FromArgb(40, 40, 40) : Color.White;
+            grid.GridColor = Border;
+            grid.DefaultCellStyle.BackColor = Dark ? Color.FromArgb(45, 45, 45) : Color.White;
+            grid.DefaultCellStyle.ForeColor = Text;
+            grid.DefaultCellStyle.SelectionBackColor = Dark ? Color.FromArgb(38, 79, 120) : Color.FromArgb(204, 232, 255);
+            grid.DefaultCellStyle.SelectionForeColor = Text;
+            grid.ColumnHeadersDefaultCellStyle.BackColor = Surface2;
+            grid.ColumnHeadersDefaultCellStyle.ForeColor = Text;
+            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Surface2;
+        }
+
+        public static void StyleMenu(MenuStrip menu)
+        {
+            menu.BackColor = Surface2;
+            menu.ForeColor = Text;
+        }
+
+        public static void Apply(Control root)
+        {
+            if (root is Form)
+            {
+                root.BackColor = Bg;
+                root.ForeColor = Text;
+            }
+            else if (root is DataGridView)
+            {
+                StyleGrid((DataGridView)root);
+            }
+            else if (root is MenuStrip)
+            {
+                StyleMenu((MenuStrip)root);
+            }
+            else if (root is TextBox || root is ComboBox)
+            {
+                var text = root as TextBox;
+                if (text != null) StyleTextBox(text);
+                else
+                {
+                    root.BackColor = Dark ? Color.FromArgb(51, 51, 51) : Color.White;
+                    root.ForeColor = Text;
+                }
+            }
+            else if (root is Panel || root is GroupBox || root is TableLayoutPanel || root is FlowLayoutPanel)
+            {
+                root.BackColor = Bg;
+            }
+            else if (root is Label)
+            {
+                root.ForeColor = ((string)root.Tag == "muted") ? Muted : Text;
+            }
+            else if (root is FlatButton)
+            {
+                root.Invalidate();
+            }
+
+            foreach (Control child in root.Controls) Apply(child);
+            root.Invalidate(true);
         }
     }
 
+    // Native Windows button in light mode; owner-painted dark variant when enabled.
     internal sealed class FlatButton : Button
     {
         private bool _hover;
@@ -64,16 +123,14 @@ namespace VaultForge
             Text = text;
             FillColor = fill;
             HoverColor = hover;
-            TextColor = Color.White;
-            Radius = 7;
-            FlatStyle = FlatStyle.Flat;
-            FlatAppearance.BorderSize = 0;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
-                     ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
-            Font = Theme.Ui(9.5f, FontStyle.Bold);
-            Cursor = Cursors.Hand;
-            Height = 34;
+            TextColor = Color.Black;
+            Radius = 2;
+            FlatStyle = FlatStyle.System;
+            UseVisualStyleBackColor = true;
+            Font = Theme.Ui(9f);
+            Height = 26;
             TabStop = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         }
 
         protected override void OnMouseEnter(EventArgs e) { _hover = true; Invalidate(); base.OnMouseEnter(e); }
@@ -83,15 +140,18 @@ namespace VaultForge
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            var g = e.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            Color fill = _down ? ControlPaint.Dark(HoverColor, 0.08f) : (_hover ? HoverColor : FillColor);
-            using (var path = Theme.Rounded(new Rectangle(0, 0, Width - 1, Height - 1), Radius))
-            using (var brush = new SolidBrush(fill))
+            if (!Theme.Dark)
             {
-                g.FillPath(brush, path);
+                base.OnPaint(e);
+                return;
             }
-            TextRenderer.DrawText(g, Text, Font, ClientRectangle, TextColor,
+            Color fill = _down ? Color.FromArgb(48, 92, 140)
+                               : (_hover ? Color.FromArgb(72, 72, 72) : Theme.ButtonFace);
+            using (var brush = new SolidBrush(fill))
+                e.Graphics.FillRectangle(brush, ClientRectangle);
+            using (var pen = new Pen(Color.FromArgb(96, 96, 96)))
+                e.Graphics.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
+            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, Theme.Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
         }
     }
@@ -100,20 +160,9 @@ namespace VaultForge
     {
         public CardPanel()
         {
-            DoubleBuffered = true;
-            BackColor = Theme.Surface;
-            Padding = new Padding(16);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using (var path = Theme.Rounded(new Rectangle(0, 0, Width - 1, Height - 1), 10))
-            using (var pen = new Pen(Theme.Border))
-            {
-                e.Graphics.DrawPath(pen, path);
-            }
+            BackColor = SystemColors.Control;
+            BorderStyle = BorderStyle.FixedSingle;
+            Padding = new Padding(10);
         }
     }
 }

@@ -13,7 +13,10 @@ PowerShell bridge and calls the same `agent.vault_store` API that
 - Window controls: fullscreen, 1/16 screen size, minimize, resize.
 - Over-the-air (OTA) updates: downloads the released `.msi`, verifies its size
   and SHA-256 checksum, then silently installs it and restarts the app. A manual
-  download button is kept as fallback; auto-install can be enabled in Settings.
+  download button and a dark/light theme toggle sit beside it in the banner.
+- Native Windows 10 look by default, anvil application icon, optional dark theme.
+- Live system indicators (CPU, RAM, HDD C:, CPU temperature) and three gauges of
+  the heaviest processes while Hermes works.
 
 ## Requirements
 
@@ -37,11 +40,11 @@ The MSI is built from `installer/product.wxs`. On Windows, use WiX Toolset 3.x:
 
 ```powershell
 candle installer\product.wxs
-light -ext WixUIExtension -o VaultForge-1.0.2.msi product.wixobj
+light -ext WixUIExtension -o VaultForge-1.0.3.msi product.wixobj
 ```
 
 The checked-in `installer/product.wxs` was also built on Linux with `wixl`.
-Publish `VaultForge-1.0.2.msi.sha256` beside the MSI on GitHub Releases so OTA
+Publish `VaultForge-1.0.3.msi.sha256` beside the MSI on GitHub Releases so OTA
 can verify the download before installing.
 
 ## Security

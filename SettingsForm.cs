@@ -103,6 +103,7 @@ namespace VaultForge
             panel.Controls.Add(grid);
             panel.Controls.Add(buttons);
             Controls.Add(panel);
+            Theme.Apply(this);
             AcceptButton = save;
             CancelButton = cancel;
         }

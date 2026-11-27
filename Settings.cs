@@ -12,11 +12,13 @@ namespace VaultForge
         public string HermesHome { get; set; }
         public bool CheckUpdates { get; set; }
         public bool AutoInstallUpdates { get; set; }
+        public bool DarkTheme { get; set; }
 
         public AppSettings()
         {
             CheckUpdates = true;
             AutoInstallUpdates = false;
+            DarkTheme = false;
         }
 
         private static string SettingsDir

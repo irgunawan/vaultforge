@@ -9,7 +9,7 @@ namespace VaultForge
 {
     internal sealed class MainForm : Form
     {
-        private const string AppVersion = "1.0.2";
+        private const string AppVersion = "1.0.3";
 
         private readonly AppSettings _settings;
         private VaultService _vault;
@@ -29,16 +29,17 @@ namespace VaultForge
         private FlatButton _checkUpdateButton;
         private FlatButton _otaButton;
         private UpdateInfo _latestInfo;
+        private FlatButton _themeButton;
+        private ProcessGaugePanel _gauges;
+        private SystemIndicators _system;
         private bool _fullscreen;
         private Rectangle _restoreBounds;
-
-        [DllImport("dwmapi.dll")]
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
 
         public MainForm()
         {
             _settings = AppSettings.Load();
             _vault = new VaultService(_settings);
+            Theme.SetDark(_settings.DarkTheme);
 
             Text = "VaultForge";
             BackColor = Theme.Bg;
@@ -52,20 +53,9 @@ namespace VaultForge
             DoubleBuffered = true;
 
             BuildUi();
+            Theme.Apply(this);
+            ApplyThemeExtras();
             Shown += OnShown;
-        }
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-            try
-            {
-                int dark = 1;
-                DwmSetWindowAttribute(Handle, 20, ref dark, sizeof(int));
-            }
-            catch
-            {
-            }
         }
 
         private void BuildUi()
@@ -91,15 +81,15 @@ namespace VaultForge
             {
                 Dock = DockStyle.Top,
                 Height = 40,
-                BackColor = Color.FromArgb(6, 78, 59),
+                BackColor = Theme.BannerBg,
                 Visible = false,
-                Padding = new Padding(16, 6, 16, 6)
+                Padding = new Padding(12, 6, 12, 6)
             };
             _updateLabel = new Label
             {
                 Dock = DockStyle.Fill,
-                ForeColor = Color.FromArgb(167, 243, 208),
-                Font = Theme.Ui(9.5f, FontStyle.Bold),
+                ForeColor = Theme.BannerText,
+                Font = Theme.Ui(9f, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Text = ""
             };
@@ -107,7 +97,7 @@ namespace VaultForge
             {
                 Dock = DockStyle.Right,
                 AutoSize = true,
-                FlowDirection = FlowDirection.RightToLeft,
+                FlowDirection = FlowDirection.LeftToRight,
                 BackColor = Color.Transparent,
                 Margin = Padding.Empty,
                 Padding = Padding.Empty
@@ -124,86 +114,92 @@ namespace VaultForge
                 Height = 28
             };
             manualButton.Click += (s, e) => OpenUpdate();
+            _themeButton = new FlatButton(ThemeText(), Theme.Surface2, Theme.Surface2)
+            {
+                Width = 74,
+                Height = 28
+            };
+            _themeButton.Click += (s, e) => ToggleTheme();
             updateButtons.Controls.Add(_otaButton);
             updateButtons.Controls.Add(manualButton);
+            updateButtons.Controls.Add(_themeButton);
             _updateBanner.Controls.Add(_updateLabel);
             _updateBanner.Controls.Add(updateButtons);
 
             Controls.Add(content);
             Controls.Add(status);
             Controls.Add(_updateBanner);
-            Controls.Add(BuildTopBar());
+            Controls.Add(BuildMenuBar());
         }
 
-        private Panel BuildTopBar()
+        private MenuStrip BuildMenuBar()
         {
-            var bar = new Panel
+            var menu = new MenuStrip
             {
                 Dock = DockStyle.Top,
-                Height = 64,
-                BackColor = Theme.Bg,
-                Padding = new Padding(20, 10, 14, 6)
+                BackColor = Theme.Surface2,
+                ForeColor = Theme.Text,
+                RenderMode = ToolStripRenderMode.System
             };
+            MainMenuStrip = menu;
 
-            var title = new Label
-            {
-                Text = "HERMES VAULT",
-                ForeColor = Theme.Accent,
-                Font = Theme.Mono(14f, FontStyle.Bold),
-                AutoSize = true,
-                Location = new Point(20, 12)
-            };
-            var subtitle = new Label
-            {
-                Text = "PowerShell bridge  •  Windows 10 / 11",
-                ForeColor = Theme.Muted,
-                Font = Theme.Ui(9f),
-                AutoSize = true,
-                Location = new Point(22, 37)
-            };
+            var file = new ToolStripMenuItem("File");
+            var exit = new ToolStripMenuItem("Keluar");
+            exit.Click += (s, e) => Close();
+            file.DropDownItems.Add(exit);
 
-            var buttons = new FlowLayoutPanel
-            {
-                Dock = DockStyle.Right,
-                Width = 240,
-                FlowDirection = FlowDirection.RightToLeft,
-                WrapContents = false,
-                BackColor = Theme.Bg
-            };
-
-            var close = WindowButton("✕", Theme.Danger);
-            close.Click += (s, e) => Close();
-            var minimize = WindowButton("—", Theme.Surface2);
-            minimize.Click += (s, e) => WindowState = FormWindowState.Minimized;
-            var sixteenth = WindowButton("▣", Theme.Surface2);
-            sixteenth.Click += (s, e) => SetSixteenth();
-            var full = WindowButton("⛶", Theme.Surface2);
+            var view = new ToolStripMenuItem("View");
+            var full = new ToolStripMenuItem("Penuh");
             full.Click += (s, e) => ToggleFullscreen();
-            var settings = WindowButton("⚙", Theme.Surface2);
-            settings.Click += (s, e) => OpenSettings();
+            var sixteenth = new ToolStripMenuItem("1/16 Layar");
+            sixteenth.Click += (s, e) => SetSixteenth();
+            var minimize = new ToolStripMenuItem("Kecilkan");
+            minimize.Click += (s, e) => WindowState = FormWindowState.Minimized;
+            view.DropDownItems.Add(full);
+            view.DropDownItems.Add(sixteenth);
+            view.DropDownItems.Add(minimize);
 
-            buttons.Controls.Add(close);
-            buttons.Controls.Add(minimize);
-            buttons.Controls.Add(sixteenth);
-            buttons.Controls.Add(full);
-            buttons.Controls.Add(settings);
+            var settingsItem = new ToolStripMenuItem("Settings");
+            settingsItem.Click += (s, e) => OpenSettings();
 
-            bar.Controls.Add(title);
-            bar.Controls.Add(subtitle);
-            bar.Controls.Add(buttons);
-            return bar;
+            var help = new ToolStripMenuItem("Help");
+            var about = new ToolStripMenuItem("Tentang VaultForge");
+            about.Click += (s, e) => MessageBox.Show(this,
+                "VaultForge v" + AppVersion + "\nGUI Hermes local vault via PowerShell bridge.\nirgun.web.id",
+                "Tentang", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            help.DropDownItems.Add(about);
+
+            menu.Items.Add(file);
+            menu.Items.Add(view);
+            menu.Items.Add(settingsItem);
+            menu.Items.Add(help);
+            return menu;
         }
 
-        private FlatButton WindowButton(string text, Color color)
+        private static string ThemeText()
         {
-            return new FlatButton(text, color, ControlPaint.Light(color, 0.12f))
+            return Theme.Dark ? "\u2600 Light" : "\u263e Dark";
+        }
+
+        private void ToggleTheme()
+        {
+            Theme.SetDark(!Theme.Dark);
+            _settings.DarkTheme = Theme.Dark;
+            _settings.Save();
+            Theme.Apply(this);
+            ApplyThemeExtras();
+            _themeButton.Text = ThemeText();
+        }
+
+        private void ApplyThemeExtras()
+        {
+            if (_updateBanner != null)
             {
-                Width = 38,
-                Height = 28,
-                Margin = new Padding(4, 0, 0, 0),
-                Font = Theme.Ui(9.5f, FontStyle.Bold),
-                TabStop = false
-            };
+                _updateBanner.BackColor = Theme.BannerBg;
+                _updateLabel.ForeColor = Theme.BannerText;
+            }
+            if (_gauges != null) _gauges.ApplyTheme();
+            if (_system != null) _system.ApplyTheme();
         }
 
         private Control BuildFormCard()
@@ -244,8 +240,6 @@ namespace VaultForge
             {
                 Dock = DockStyle.Top,
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                BackColor = Color.FromArgb(15, 23, 42),
-                ForeColor = Theme.Text,
                 FlatStyle = FlatStyle.Flat,
                 Font = Theme.Ui(10f),
                 Margin = new Padding(0, 0, 0, 8)
@@ -298,7 +292,9 @@ namespace VaultForge
             };
             grid.Controls.Add(hint);
 
+            _system = new SystemIndicators { Dock = DockStyle.Bottom, Height = 118 };
             card.Controls.Add(grid);
+            card.Controls.Add(_system);
             return card;
         }
 
@@ -329,7 +325,7 @@ namespace VaultForge
             {
                 Dock = DockStyle.Fill,
                 BackgroundColor = Theme.Surface,
-                BorderStyle = BorderStyle.None,
+                BorderStyle = BorderStyle.FixedSingle,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 AllowUserToResizeRows = false,
@@ -343,15 +339,9 @@ namespace VaultForge
                 ColumnHeadersHeight = 32,
                 RowTemplate = { Height = 30 }
             };
-            _grid.DefaultCellStyle.BackColor = Theme.Surface;
-            _grid.DefaultCellStyle.ForeColor = Theme.Text;
-            _grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(6, 78, 59);
-            _grid.DefaultCellStyle.SelectionForeColor = Color.White;
+            Theme.StyleGrid(_grid);
             _grid.DefaultCellStyle.Font = Theme.Ui(9f);
-            _grid.ColumnHeadersDefaultCellStyle.BackColor = Theme.Surface2;
-            _grid.ColumnHeadersDefaultCellStyle.ForeColor = Theme.Muted;
-            _grid.ColumnHeadersDefaultCellStyle.Font = Theme.Ui(8.5f, FontStyle.Bold);
-            _grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Theme.Surface2;
+            _grid.ColumnHeadersDefaultCellStyle.Font = Theme.Ui(9f, FontStyle.Bold);
 
             _grid.Columns.Add(NewColumn("handle", "HANDLE", 22));
             _grid.Columns.Add(NewColumn("kind", "KIND", 10));
@@ -369,8 +359,15 @@ namespace VaultForge
             _deleteButton.Click += (s, e) => DeleteSelected();
             bottom.Controls.Add(_deleteButton);
 
+            _gauges = new ProcessGaugePanel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 104,
+                Margin = Padding.Empty
+            };
             card.Controls.Add(_grid);
             card.Controls.Add(bottom);
+            card.Controls.Add(_gauges);
             card.Controls.Add(header);
             return card;
         }
@@ -392,15 +389,15 @@ namespace VaultForge
             {
                 Dock = DockStyle.Bottom,
                 Height = 34,
-                BackColor = Color.FromArgb(8, 13, 25),
-                Padding = new Padding(16, 6, 12, 4)
+                BackColor = Theme.Surface2,
+                Padding = new Padding(12, 4, 12, 4)
             };
             _statusLabel = new Label
             {
                 Dock = DockStyle.Fill,
                 Text = "Siap. Pastikan Hermes dan Python sudah terpasang.",
-                ForeColor = Theme.Muted,
-                Font = Theme.Ui(8.5f),
+                ForeColor = Theme.Text,
+                Font = Theme.Ui(9f),
                 TextAlign = ContentAlignment.MiddleLeft
             };
 
@@ -409,7 +406,7 @@ namespace VaultForge
                 Dock = DockStyle.Right,
                 Width = 150,
                 Text = "v" + AppVersion + "  •  irgun.web.id",
-                ForeColor = Color.FromArgb(71, 85, 105),
+                ForeColor = Theme.Muted,
                 Font = Theme.Mono(8f),
                 TextAlign = ContentAlignment.MiddleRight
             };
@@ -419,7 +416,7 @@ namespace VaultForge
                 Dock = DockStyle.Right,
                 Width = 108,
                 Height = 24,
-                Font = Theme.Ui(8f, FontStyle.Bold),
+                Font = Theme.Ui(9f),
                 Margin = new Padding(0, 0, 8, 0)
             };
             _checkUpdateButton.Click += (s, e) => CheckUpdates(true);
@@ -435,10 +432,10 @@ namespace VaultForge
             return new Label
             {
                 Text = text,
-                ForeColor = Theme.Muted,
-                Font = Theme.Ui(8.5f, FontStyle.Bold),
+                ForeColor = Theme.Text,
+                Font = Theme.Ui(9f),
                 AutoSize = true,
-                Margin = new Padding(0, 8, 0, 3)
+                Margin = new Padding(0, 6, 0, 2)
             };
         }
 
