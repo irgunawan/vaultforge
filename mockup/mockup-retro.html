@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>VaultForge Retro Mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #080604; }
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    color: #f1e6cf;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+  }
+  .app {
+    position: relative; width: 1440px; height: 900px; overflow: hidden;
+    background:
+      radial-gradient(900px 480px at 88% 82%, rgba(176,141,87,.12), transparent 65%),
+      radial-gradient(700px 400px at 8% 0%, rgba(110,42,34,.12), transparent 65%),
+      linear-gradient(180deg, #17110c, #0f0b08 60%, #0b0806);
+    border: 1px solid #5d4a30;
+    box-shadow: 0 40px 120px rgba(0,0,0,.8);
+  }
+  .app::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px),
+      radial-gradient(circle at 25% 30%, rgba(255,255,255,.03), transparent 40%);
+    mix-blend-mode: overlay;
+  }
+
+  /* faint anvil, sepia */
+  .anvil {
+    position: absolute; right: -120px; bottom: -80px; width: 1020px; height: 760px;
+    background: url("anvil.jpg") center center / cover no-repeat;
+    filter: sepia(1) saturate(.55) brightness(.55) contrast(1.25);
+    opacity: .22;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 60% 52%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 62% 58% at 60% 52%, #000 30%, transparent 78%);
+    pointer-events: none;
+  }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);
+  }
+
+  /* Top bar */
+  .topbar {
+    position: relative; height: 82px; display: flex; align-items: center;
+    padding: 0 28px;
+    background: linear-gradient(180deg, #241a11, #17110c);
+    border-bottom: 3px double #8d6f45;
+    box-shadow: 0 6px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .mark {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e6c98b, #a77c3f 55%, #64451f);
+    border: 2px solid #d8b877;
+    display: grid; place-items: center; margin-right: 16px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,.55), 0 0 22px rgba(201,162,94,.18);
+    color: #2a1b0d; font-size: 24px; font-weight: 700;
+  }
+  .brand { display: flex; flex-direction: column; line-height: 1; }
+  .brand b {
+    font-size: 26px; letter-spacing: .22em; color: #efd9a8;
+    text-shadow: 0 1px 0 #000, 0 0 18px rgba(201,162,94,.15);
+  }
+  .brand span {
+    font-family: "Courier New", monospace; font-size: 9px; letter-spacing: .26em;
+    color: #9f8662; margin-top: 7px;
+  }
+  .badge {
+    margin-left: 24px; font-family: "Courier New", monospace; font-size: 9px;
+    letter-spacing: .16em; color: #d8b877; border: 1px solid #6c5333;
+    padding: 6px 10px; background: rgba(80,55,28,.25);
+  }
+  .window-btns { margin-left: auto; display: flex; gap: 8px; }
+  .wbtn {
+    width: 38px; height: 30px; display: grid; place-items: center;
+    background: linear-gradient(180deg, #2a2016, #19120c);
+    border: 1px solid #6c5333; color: #d8c39a;
+    font-family: "Courier New", monospace; font-size: 13px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .wbtn.close { background: linear-gradient(180deg, #6e2a22, #3d1712); border-color: #8e3a2e; color: #f3c7bd; }
+
+  /* Layout */
+  .content {
+    position: relative; display: grid; grid-template-columns: 420px 1fr;
+    gap: 22px; padding: 22px 26px 16px; height: calc(100% - 116px);
+    align-items: stretch;
+  }
+  .rightcol { display: flex; flex-direction: column; min-height: 0; }
+
+  .card {
+    height: 100%;
+    background:
+      linear-gradient(180deg, rgba(34,26,18,.96), rgba(22,17,12,.97));
+    border: 1px solid #6c5333;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35), inset 0 0 0 1px rgba(216,184,119,.08);
+    position: relative;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 5px; border: 1px solid rgba(216,184,119,.12);
+    pointer-events: none;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 11px; border-bottom: 1px solid #5b462b;
+  }
+  .card-head h2 {
+    margin: 0; font-size: 15px; letter-spacing: .14em; text-transform: uppercase;
+    color: #e6cf9f; font-weight: 600;
+  }
+  .chip {
+    font-family: "Courier New", monospace; font-size: 8px; letter-spacing: .14em;
+    color: #d8b877; border: 1px solid #6c5333; padding: 5px 8px;
+    background: rgba(80,55,28,.26);
+  }
+
+  /* Form */
+  .form { padding: 15px 20px 18px; }
+  .field { margin-bottom: 10px; }
+  .field label {
+    display: block; color: #b39a72; font-family: "Courier New", monospace;
+    font-size: 9px; letter-spacing: .13em; margin-bottom: 5px; text-transform: uppercase;
+  }
+  .input {
+    height: 34px; border: 1px solid #8d6f45;
+    background: linear-gradient(180deg, #f7ecd4, #e8d8b6);
+    display: flex; align-items: center; padding: 0 11px;
+    color: #2b2118; font-family: "Courier New", monospace; font-size: 12px;
+    box-shadow: inset 0 2px 4px rgba(70,45,18,.22), 0 1px 0 rgba(255,255,255,.04);
+  }
+  .input .ph { color: #9c8460; }
+  .input .eye { margin-left: auto; color: #6f5736; font-size: 13px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn {
+    height: 38px; display: grid; place-items: center;
+    font-family: "Courier New", monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: .10em; color: #21160b;
+    background: linear-gradient(180deg, #d8b877, #a77c3f 55%, #7c5829);
+    border: 1px solid #e6cf9f;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 16px rgba(0,0,0,.3);
+    text-shadow: 0 1px 0 rgba(255,255,255,.25);
+  }
+  .btn.ghost {
+    background: linear-gradient(180deg, #3a2a1c, #241a11);
+    color: #d8b877; border: 1px solid #6c5333; box-shadow: none;
+    text-shadow: none; margin-top: 8px;
+  }
+  .hint { margin-top: 12px; color: #8f7a5b; font-size: 10px; line-height: 1.55; font-style: italic; }
+
+  /* Ledger table */
+  .vault-card { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .vault-card .table { flex: 1; padding: 4px 12px 10px; }
+  .thead, .trow {
+    display: grid; grid-template-columns: 1.15fr .55fr 1.2fr 1.15fr 1.25fr;
+    gap: 10px; align-items: center; padding: 9px 8px;
+  }
+  .thead {
+    color: #a98d64; font-family: "Courier New", monospace; font-size: 8px;
+    letter-spacing: .15em; border-bottom: 1px solid #5b462b;
+  }
+  .trow {
+    border-bottom: 1px dotted rgba(141,111,69,.45);
+    font-size: 11px; color: #e6d8bb;
+  }
+  .trow:nth-child(odd) { background: rgba(255,255,255,.015); }
+  .trow .h { font-family: "Courier New", monospace; color: #d8b877; font-size: 9.5px; }
+  .trow .k {
+    font-family: "Courier New", monospace; font-size: 8px; color: #d8b877;
+    border: 1px solid #6c5333; background: rgba(80,55,28,.25);
+    padding: 2px 6px; width: max-content;
+  }
+  .trow .o { color: #9f8662; font-size: 9.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Analog gauges */
+  .proc-card { margin-top: 18px; flex: none; height: auto; }
+  .proc-head { display: flex; align-items: baseline; gap: 10px; }
+  .proc-head small { color: #9f8662; font-size: 9px; font-family: "Courier New", monospace; }
+  .gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 10px 18px 16px; }
+  .gauge {
+    display: flex; align-items: center; gap: 13px;
+    padding: 12px 12px 10px;
+    background: linear-gradient(180deg, rgba(38,29,20,.92), rgba(22,17,12,.95));
+    border: 1px solid #5b462b;
+    box-shadow: inset 0 0 20px rgba(0,0,0,.35);
+  }
+  .dial-wrap { position: relative; width: 104px; height: 104px; flex: none; }
+  .bezel {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #dfc084, #a77c3f 45%, #5b3d1b 78%, #2a1b0d);
+    box-shadow: inset 0 0 8px rgba(0,0,0,.6), 0 0 20px rgba(201,162,94,.12);
+  }
+  .dial {
+    position: absolute; inset: 7px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 42%, #fbf1d9, #ead9b6 62%, #d2bb91 100%);
+    box-shadow: inset 0 0 14px rgba(92,62,25,.35);
+    overflow: hidden;
+  }
+  .ticks {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(from 210deg, #3b2a17 0deg 1deg, transparent 1deg 10deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 56%, #000 57% 64%, transparent 65%);
+    mask: radial-gradient(circle, transparent 0 56%, #000 57% 64%, transparent 65%);
+    opacity: .9;
+  }
+  .ticks-major {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(from 210deg, #2a1b0d 0deg 1.8deg, transparent 1.8deg 30deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 61%, #000 62% 67%, transparent 68%);
+    mask: radial-gradient(circle, transparent 0 61%, #000 62% 67%, transparent 68%);
+  }
+  .needle {
+    position: absolute; left: calc(50% - 1px); bottom: 50%;
+    width: 2px; height: 38px; background: linear-gradient(#7f1d1d, #c02626);
+    transform-origin: bottom center;
+    transform: rotate(var(--angle));
+    box-shadow: 0 0 4px rgba(120,20,20,.35);
+    border-radius: 1px;
+  }
+  .needle::after {
+    content: ""; position: absolute; left: -3px; bottom: -4px; width: 8px; height: 8px;
+    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #e6cf9f, #7c5829);
+    border: 1px solid #3b2a17;
+  }
+  .dial-label {
+    position: absolute; left: 0; right: 0; bottom: 13px; text-align: center;
+    font-family: "Courier New", monospace; font-size: 7px; letter-spacing: .14em;
+    color: #6f5736;
+  }
+  .dial-value {
+    position: absolute; left: 0; right: 0; top: 58%; text-align: center;
+    font-family: Georgia, serif; font-size: 13px; font-weight: 700; color: #3b2a17;
+  }
+  .gmeta { min-width: 0; }
+  .gmeta b {
+    display: block; font-family: "Courier New", monospace; font-size: 10.5px;
+    color: #efd9a8; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .gmeta .sub { font-size: 8.5px; color: #9f8662; font-family: "Courier New", monospace; }
+  .gmeta .mem { margin-top: 6px; font-size: 8.5px; color: #c9b184; font-family: "Courier New", monospace; }
+  .bar { height: 4px; background: #2a1b0d; border: 1px solid #5b462b; margin-top: 7px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: var(--v); background: linear-gradient(90deg, #7c5829, #d8b877); }
+
+  /* Status */
+  .statusbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+    background: linear-gradient(180deg, #17110c, #0d0906);
+    border-top: 1px solid #5b462b; display: flex; align-items: center;
+    padding: 0 26px; gap: 12px;
+    font-family: "Courier New", monospace; font-size: 9px; color: #9f8662;
+  }
+  .statusbar .ok { color: #c9a25e; }
+  .statusbar .right { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="anvil"></div>
+  <div class="vignette"></div>
+
+  <div class="topbar">
+    <div class="mark">⚒</div>
+    <div class="brand">
+      <b>VAULTFORGE</b>
+      <span>HERMES VAULT · WORKSHOP INSTRUMENT</span>
+    </div>
+    <div class="badge">RETRO CLASSIC · EST. MMXXVI</div>
+    <div class="window-btns">
+      <div class="wbtn">⚙</div>
+      <div class="wbtn">⛶</div>
+      <div class="wbtn">▣</div>
+      <div class="wbtn">—</div>
+      <div class="wbtn close">✕</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <section class="card">
+      <div class="card-head">
+        <h2>Tambah Login</h2>
+        <span class="chip">BRIDGE READY</span>
+      </div>
+      <div class="form">
+        <div class="field"><label>Label</label><div class="input">GitHub work account</div></div>
+        <div class="field"><label>Site Origin</label><div class="input">https://github.com</div></div>
+        <div class="row2">
+          <div class="field"><label>Identifier Type</label><div class="input">email</div></div>
+          <div class="field"><label>Identifier</label><div class="input">irgunawan@…</div></div>
+        </div>
+        <div class="field"><label>Password</label><div class="input"><span class="ph">••••••••••••••••</span><span class="eye">◉</span></div></div>
+        <div class="field"><label>Authenticator Key (opsional)</label><div class="input"><span class="ph">otpauth:// atau seed base32</span></div></div>
+        <div class="btn">SIMPAN KE VAULT</div>
+        <div class="btn ghost">BERSIHKAN</div>
+        <div class="hint">Password tidak pernah ditampilkan kembali. Vault memakai kunci lokal Hermes.</div>
+      </div>
+    </section>
+
+    <section class="rightcol">
+      <div class="card vault-card">
+        <div class="card-head">
+          <h2>Item Vault</h2>
+          <span class="chip">12 ITEM</span>
+        </div>
+        <div class="table">
+          <div class="thead"><span>Handle</span><span>Kind</span><span>Label</span><span>Identifier</span><span>Origin</span></div>
+          <div class="trow"><span class="h">vault_d91242573621</span><span class="k">login</span><span>webminsmd</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_d2ac1fe08762</span><span class="k">login</span><span>portalpoc</span><span>OC62IRG</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+          <div class="trow"><span class="h">vault_604833120d33</span><span class="k">login</span><span>PMA</span><span>root</span><span class="o">https://pma.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_2a2ffc91c045</span><span class="k">login</span><span>portalMEL</span><span>OC62MEL</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+          <div class="trow"><span class="h">vault_2d1a62999e24</span><span class="k">login</span><span>cloudflare</span><span>tepianloop@gmail.com</span><span class="o">https://dash.cloudflare.com</span></div>
+          <div class="trow"><span class="h">vault_37105f2ca94e</span><span class="k">login</span><span>Instagram</span><span>tepianloop</span><span class="o">https://instagram.com</span></div>
+          <div class="trow"><span class="h">vault_61b8fe0e43da</span><span class="k">login</span><span>WebminPusda</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_58debfdf02b4</span><span class="k">login</span><span>PortalIrgun</span><span>OC62IRG</span><span class="o">https://portal.irgun.web.id</span></div>
+          <div class="trow"><span class="h">vault_631d93279178</span><span class="k">login</span><span>spacehost</span><span>indonesiapoc9@gmail.com</span><span class="o">https://ai.spacehost.co.id</span></div>
+          <div class="trow"><span class="h">vault_842546f44968</span><span class="k">login</span><span>QWORDS</span><span>tepianloop@gmail.com</span><span class="o">https://portal.qwords.com</span></div>
+        </div>
+      </div>
+
+      <div class="card proc-card">
+        <div class="card-head proc-head">
+          <h2>Proses Terberat</h2>
+          <small>saat Hermes bekerja · top 3 CPU</small>
+          <span class="chip" style="margin-left:auto">LIVE 2s</span>
+        </div>
+        <div class="gauges">
+          <div class="gauge" style="--v:42">
+            <div class="dial-wrap">
+              <div class="bezel"></div>
+              <div class="dial">
+                <div class="ticks"></div><div class="ticks-major"></div>
+                <div class="needle" style="--angle:-19deg"></div>
+                <div class="dial-value">42</div><div class="dial-label">CPU LOAD</div>
+              </div>
+            </div>
+            <div class="gmeta"><b>hermes-gateway</b><div class="sub">PID 4182 · python</div><div class="mem">RAM 318 MB</div><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:23">
+            <div class="dial-wrap">
+              <div class="bezel"></div>
+              <div class="dial">
+                <div class="ticks"></div><div class="ticks-major"></div>
+                <div class="needle" style="--angle:-65deg"></div>
+                <div class="dial-value">23</div><div class="dial-label">CPU LOAD</div>
+              </div>
+            </div>
+            <div class="gmeta"><b>chromium</b><div class="sub">PID 5127 · browser-use</div><div class="mem">RAM 604 MB</div><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:18">
+            <div class="dial-wrap">
+              <div class="bezel"></div>
+              <div class="dial">
+                <div class="ticks"></div><div class="ticks-major"></div>
+                <div class="needle" style="--angle:-77deg"></div>
+                <div class="dial-value">18</div><div class="dial-label">CPU LOAD</div>
+              </div>
+            </div>
+            <div class="gmeta"><b>python</b><div class="sub">PID 6071 · vault bridge</div><div class="mem">RAM 96 MB</div><div class="bar"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="statusbar">
+    <span class="ok">●</span> Vault siap · PowerShell bridge terhubung
+    <span class="right">v1.0.1 · irgun.web.id · Windows 10/11</span>
+  </div>
+</div>
+</body>
+</html>

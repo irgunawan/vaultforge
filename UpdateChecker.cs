@@ -6,11 +6,11 @@ using System.Net;
 using System.Text;
 using System.Web.Script.Serialization;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal static class UpdateChecker
     {
-        public const string Repo = "irgunawan/hermes-vault-manager";
+        public const string Repo = "irgunawan/vaultforge";
         public const string ApiUrl = "https://api.github.com/repos/" + Repo + "/releases/latest";
 
         public static UpdateInfo Check(string currentVersion)
@@ -20,7 +20,7 @@ namespace HermesVaultManager
             {
                 ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
                 var request = (HttpWebRequest)WebRequest.Create(ApiUrl);
-                request.UserAgent = "HermesVaultManager/" + currentVersion;
+                request.UserAgent = "VaultForge/" + currentVersion;
                 request.Accept = "application/vnd.github+json";
                 request.Timeout = 15000;
                 request.ReadWriteTimeout = 15000;

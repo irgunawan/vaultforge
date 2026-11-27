@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal sealed class MainForm : Form
     {
-        private const string AppVersion = "1.0.0";
+        private const string AppVersion = "1.0.1";
 
         private readonly AppSettings _settings;
         private VaultService _vault;
@@ -38,7 +38,7 @@ namespace HermesVaultManager
             _settings = AppSettings.Load();
             _vault = new VaultService(_settings);
 
-            Text = "Hermes Vault Manager";
+            Text = "VaultForge";
             BackColor = Theme.Bg;
             ForeColor = Theme.Text;
             Font = Theme.Ui(9.5f);

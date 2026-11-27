@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>VaultForge Natural Mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #2a2620; }
+  body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    color: #2f261b;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+  }
+  .desktop {
+    width: 1440px; height: 900px; padding: 26px;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.035), transparent 38%),
+      linear-gradient(180deg, #322d26, #24211c);
+  }
+  .app {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    background: #e9dfc9;
+    border: 1px solid #17130f;
+    box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 2px 0 rgba(255,255,255,.08) inset;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(90,70,40,.025) 0 1px, transparent 1px 3px),
+      radial-gradient(circle at 80% 70%, rgba(120,90,50,.06), transparent 45%);
+  }
+
+  /* very faint anvil watermark, like a letterpress mark */
+  .anvil {
+    position: absolute; right: -80px; bottom: -50px; width: 760px; height: 560px;
+    background: url("anvil.jpg") center center / cover no-repeat;
+    filter: sepia(1) contrast(1.1) brightness(.7);
+    opacity: .075;
+    mix-blend-mode: multiply;
+    -webkit-mask-image: radial-gradient(ellipse 60% 58% at 55% 50%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 60% 58% at 55% 50%, #000 30%, transparent 78%);
+    pointer-events: none;
+  }
+
+  /* Classic window chrome */
+  .titlebar {
+    height: 34px; display: flex; align-items: center;
+    background: linear-gradient(180deg, #4a3826, #352719);
+    border-bottom: 1px solid #1d1610;
+    color: #f0e3c8; padding: 0 8px 0 10px;
+    font-size: 12px; letter-spacing: .02em;
+  }
+  .titlebar .icon {
+    width: 18px; height: 18px; margin-right: 8px; border-radius: 3px;
+    background: linear-gradient(145deg, #c7a76d, #7b5a2c);
+    display: grid; place-items: center; color: #2a1c0d; font-size: 11px;
+  }
+  .titlebar b { font-weight: 600; }
+  .titlebar .wbuttons { margin-left: auto; display: flex; gap: 3px; }
+  .wbtn {
+    width: 27px; height: 22px; display: grid; place-items: center;
+    background: #d8cbb3; border: 1px solid #8e7a59;
+    color: #332818; font-family: Tahoma, sans-serif; font-size: 11px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+  }
+  .wbtn.close { background: #b85a4a; border-color: #7a2e26; color: #fff6ee; }
+
+  .menubar {
+    height: 27px; display: flex; align-items: center; gap: 20px;
+    padding: 0 12px; background: #ded2ba;
+    border-bottom: 1px solid #b9a17c;
+    font-size: 11px; color: #3c2f20;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .menubar span { opacity: .92; }
+  .menubar .right { margin-left: auto; font-family: Consolas, monospace; font-size: 9px; color: #6f5b3e; }
+
+  /* Layout */
+  .content {
+    display: grid; grid-template-columns: 410px 1fr;
+    gap: 20px; padding: 16px 18px 12px;
+    height: calc(100% - 34px - 27px - 24px);
+  }
+  .leftpane {
+    border-right: 1px solid #b9a17c;
+    padding-right: 20px;
+    display: flex; flex-direction: column;
+  }
+  .rightpane { display: flex; flex-direction: column; min-height: 0; }
+
+  h1 {
+    margin: 0 0 2px; font-family: Georgia, "Times New Roman", serif;
+    font-size: 23px; font-weight: 700; letter-spacing: .10em; color: #3a2a1c;
+  }
+  .sub {
+    margin: 0 0 14px; font-family: Consolas, monospace;
+    font-size: 9px; letter-spacing: .12em; color: #7b6546;
+  }
+  h2 {
+    margin: 0 0 10px; font-size: 12px; font-weight: 700;
+    color: #3a2a1c; letter-spacing: .03em;
+  }
+
+  .field { margin-bottom: 9px; }
+  .field label {
+    display: block; margin-bottom: 3px;
+    font-size: 10px; font-weight: 600; color: #5b4a34;
+  }
+  .input {
+    height: 29px; display: flex; align-items: center; padding: 0 8px;
+    background: #fbf5e8; border: 1px solid #a89472;
+    box-shadow: inset 1px 1px 2px rgba(70,50,25,.14);
+    font-family: Consolas, monospace; font-size: 11px; color: #2f261b;
+  }
+  .input .ph { color: #94805f; }
+  .input .eye { margin-left: auto; color: #6f5b3e; font-size: 11px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+
+  .btn {
+    height: 31px; display: grid; place-items: center; margin-top: 10px;
+    background: linear-gradient(180deg, #d9c49a, #c1a676);
+    border: 1px solid #8e744e; color: #332617;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 1px 1px 0 rgba(80,55,25,.18);
+  }
+  .btn.ghost {
+    margin-top: 6px; background: #e4d7c0; color: #5b4a34;
+    font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .hint {
+    margin-top: 10px; padding-top: 9px; border-top: 1px dotted #b9a17c;
+    font-size: 10px; line-height: 1.45; color: #6f5b3e;
+  }
+
+  /* Win32-ish group box */
+  .group {
+    position: relative; border: 1px solid #a89472;
+    background: rgba(251,245,232,.42);
+    padding: 14px 12px 10px;
+    margin-bottom: 12px;
+  }
+  .group > .legend {
+    position: absolute; top: -8px; left: 9px;
+    padding: 0 5px; background: #e9dfc9;
+    font-size: 10px; font-weight: 700; color: #4a3826;
+  }
+  .vault-group { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .vault-group .table { flex: 1; overflow: hidden; }
+
+  .thead, .trow {
+    display: grid; grid-template-columns: 1.15fr .55fr 1.2fr 1.15fr 1.25fr;
+    gap: 9px; align-items: center; padding: 6px 5px;
+  }
+  .thead {
+    border-bottom: 1px solid #a89472;
+    font-family: Consolas, monospace; font-size: 8px; letter-spacing: .10em;
+    color: #6f5b3e;
+  }
+  .trow {
+    border-bottom: 1px dotted #c7b492;
+    font-size: 10.5px; color: #332818;
+  }
+  .trow:nth-child(even) { background: rgba(120,90,50,.035); }
+  .trow .h { font-family: Consolas, monospace; font-size: 9px; color: #6f4e27; }
+  .trow .k {
+    font-family: Consolas, monospace; font-size: 8px; color: #6f4e27;
+    border: 1px solid #b9a17c; background: #efe4cf; padding: 1px 5px; width: max-content;
+  }
+  .trow .o { color: #7b6546; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Analog meters */
+  .meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding-top: 3px; }
+  .meter { display: flex; align-items: center; gap: 12px; }
+  .dial-wrap { position: relative; width: 94px; height: 94px; flex: none; }
+  .bezel {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: linear-gradient(145deg, #c7a76d, #8e6b37 55%, #5b3d1b);
+    box-shadow: inset 0 0 4px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.25);
+  }
+  .dial {
+    position: absolute; inset: 6px; border-radius: 50%;
+    background: #f7ecd4; border: 1px solid #b9a17c;
+    overflow: hidden;
+  }
+  .ticks {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(from 210deg, #4a3826 0deg 1deg, transparent 1deg 10deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 58%, #000 59% 64%, transparent 65%);
+    mask: radial-gradient(circle, transparent 0 58%, #000 59% 64%, transparent 65%);
+  }
+  .ticks-major {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(from 210deg, #2f261b 0deg 1.6deg, transparent 1.6deg 30deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 63% 67%, transparent 68%);
+    mask: radial-gradient(circle, transparent 0 62%, #000 63% 67%, transparent 68%);
+  }
+  .needle {
+    position: absolute; left: calc(50% - 1px); bottom: 50%;
+    width: 2px; height: 33px; background: #8e2f27;
+    transform-origin: bottom center; transform: rotate(var(--angle));
+  }
+  .needle::after {
+    content: ""; position: absolute; left: -3px; bottom: -3px; width: 8px; height: 8px;
+    border-radius: 50%; background: #6f4e27; border: 1px solid #3a2a1c;
+  }
+  .scale {
+    position: absolute; font-family: Consolas, monospace; font-size: 6px; color: #7b6546;
+  }
+  .s0 { left: 14px; bottom: 31px; }
+  .s5 { left: 45px; top: 8px; }
+  .s10 { right: 11px; bottom: 31px; }
+  .dial-value {
+    position: absolute; left: 0; right: 0; top: 57%; text-align: center;
+    font-family: Consolas, monospace; font-size: 12px; font-weight: 700; color: #3a2a1c;
+  }
+  .dial-label {
+    position: absolute; left: 0; right: 0; bottom: 10px; text-align: center;
+    font-family: Consolas, monospace; font-size: 6px; letter-spacing: .12em; color: #7b6546;
+  }
+  .mmeta { min-width: 0; }
+  .mmeta b {
+    display: block; font-size: 10.5px; color: #332818; margin-bottom: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mmeta .sub { font-family: Consolas, monospace; font-size: 8px; color: #7b6546; }
+  .mmeta .mem { margin-top: 5px; font-family: Consolas, monospace; font-size: 8px; color: #5b4a34; }
+  .bar { height: 3px; background: #d8cbb3; border: 1px solid #b9a17c; margin-top: 6px; }
+  .bar i { display: block; height: 100%; width: var(--v); background: #8e6b37; }
+
+  .statusbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 24px;
+    display: flex; align-items: center; gap: 10px; padding: 0 10px;
+    background: #ded2ba; border-top: 1px solid #a89472;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    font-size: 9px; color: #5b4a34;
+  }
+  .statusbar .cell { border: 1px solid #b9a17c; padding: 1px 6px; background: #e9dfc9; }
+  .statusbar .right { margin-left: auto; font-family: Consolas, monospace; font-size: 8.5px; }
+</style>
+</head>
+<body>
+<div class="desktop">
+  <div class="app">
+    <div class="anvil"></div>
+
+    <div class="titlebar">
+      <span class="icon">⚒</span>
+      <b>VaultForge</b>
+      <span style="margin-left:7px;opacity:.65">— Hermes Vault Manager</span>
+      <div class="wbuttons">
+        <div class="wbtn">—</div><div class="wbtn">□</div><div class="wbtn close">✕</div>
+      </div>
+    </div>
+
+    <div class="menubar">
+      <span>File</span><span>Edit</span><span>Vault</span><span>Tampilan</span><span>Bantuan</span>
+      <span class="right">Windows 10/11 · v1.0.1</span>
+    </div>
+
+    <div class="content">
+      <section class="leftpane">
+        <h1>VAULTFORGE</h1>
+        <p class="sub">HERMES VAULT · POWERSHELL BRIDGE</p>
+
+        <h2>Tambah login</h2>
+        <div class="field"><label>Label</label><div class="input">GitHub work account</div></div>
+        <div class="field"><label>Site origin</label><div class="input">https://github.com</div></div>
+        <div class="row2">
+          <div class="field"><label>Identifier type</label><div class="input">email</div></div>
+          <div class="field"><label>Identifier</label><div class="input">irgunawan@…</div></div>
+        </div>
+        <div class="field"><label>Password</label><div class="input"><span class="ph">••••••••••••••••</span><span class="eye">◉</span></div></div>
+        <div class="field"><label>Authenticator key (opsional)</label><div class="input"><span class="ph">otpauth:// atau seed base32</span></div></div>
+
+        <div class="btn">SIMPAN KE VAULT</div>
+        <div class="btn ghost">BERSIHKAN</div>
+        <div class="hint">Password tidak pernah ditampilkan kembali. Vault memakai kunci lokal Hermes.</div>
+      </section>
+
+      <section class="rightpane">
+        <div class="group vault-group">
+          <span class="legend">Item Vault — 12 item</span>
+          <div class="table">
+            <div class="thead"><span>Handle</span><span>Kind</span><span>Label</span><span>Identifier</span><span>Origin</span></div>
+            <div class="trow"><span class="h">vault_d91242573621</span><span class="k">login</span><span>webminsmd</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+            <div class="trow"><span class="h">vault_d2ac1fe08762</span><span class="k">login</span><span>portalpoc</span><span>OC62IRG</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+            <div class="trow"><span class="h">vault_604833120d33</span><span class="k">login</span><span>PMA</span><span>root</span><span class="o">https://pma.pocindonesia.com</span></div>
+            <div class="trow"><span class="h">vault_2a2ffc91c045</span><span class="k">login</span><span>portalMEL</span><span>OC62MEL</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+            <div class="trow"><span class="h">vault_2d1a62999e24</span><span class="k">login</span><span>cloudflare</span><span>tepianloop@gmail.com</span><span class="o">https://dash.cloudflare.com</span></div>
+            <div class="trow"><span class="h">vault_37105f2ca94e</span><span class="k">login</span><span>Instagram</span><span>tepianloop</span><span class="o">https://instagram.com</span></div>
+            <div class="trow"><span class="h">vault_61b8fe0e43da</span><span class="k">login</span><span>WebminPusda</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+            <div class="trow"><span class="h">vault_58debfdf02b4</span><span class="k">login</span><span>PortalIrgun</span><span>OC62IRG</span><span class="o">https://portal.irgun.web.id</span></div>
+            <div class="trow"><span class="h">vault_631d93279178</span><span class="k">login</span><span>spacehost</span><span>indonesiapoc9@gmail.com</span><span class="o">https://ai.spacehost.co.id</span></div>
+            <div class="trow"><span class="h">vault_842546f44968</span><span class="k">login</span><span>QWORDS</span><span>tepianloop@gmail.com</span><span class="o">https://portal.qwords.com</span></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <span class="legend">Proses terberat — saat Hermes bekerja</span>
+          <div class="meters">
+            <div class="meter" style="--v:42">
+              <div class="dial-wrap">
+                <div class="bezel"></div>
+                <div class="dial">
+                  <div class="ticks"></div><div class="ticks-major"></div>
+                  <span class="scale s0">0</span><span class="scale s5">50</span><span class="scale s10">100</span>
+                  <div class="needle" style="--angle:-19deg"></div>
+                  <div class="dial-value">42</div><div class="dial-label">CPU LOAD</div>
+                </div>
+              </div>
+              <div class="mmeta"><b>hermes-gateway</b><div class="sub">PID 4182 · python</div><div class="mem">RAM 318 MB</div><div class="bar"><i></i></div></div>
+            </div>
+            <div class="meter" style="--v:23">
+              <div class="dial-wrap">
+                <div class="bezel"></div>
+                <div class="dial">
+                  <div class="ticks"></div><div class="ticks-major"></div>
+                  <span class="scale s0">0</span><span class="scale s5">50</span><span class="scale s10">100</span>
+                  <div class="needle" style="--angle:-65deg"></div>
+                  <div class="dial-value">23</div><div class="dial-label">CPU LOAD</div>
+                </div>
+              </div>
+              <div class="mmeta"><b>chromium</b><div class="sub">PID 5127 · browser-use</div><div class="mem">RAM 604 MB</div><div class="bar"><i></i></div></div>
+            </div>
+            <div class="meter" style="--v:18">
+              <div class="dial-wrap">
+                <div class="bezel"></div>
+                <div class="dial">
+                  <div class="ticks"></div><div class="ticks-major"></div>
+                  <span class="scale s0">0</span><span class="scale s5">50</span><span class="scale s10">100</span>
+                  <div class="needle" style="--angle:-77deg"></div>
+                  <div class="dial-value">18</div><div class="dial-label">CPU LOAD</div>
+                </div>
+              </div>
+              <div class="mmeta"><b>python</b><div class="sub">PID 6071 · vault bridge</div><div class="mem">RAM 96 MB</div><div class="bar"><i></i></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="statusbar">
+      <span class="cell">Vault siap</span>
+      <span class="cell">PowerShell bridge terhubung</span>
+      <span class="right">v1.0.1 · irgun.web.id</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

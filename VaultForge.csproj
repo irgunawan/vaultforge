@@ -5,14 +5,14 @@
     <UseWindowsForms>true</UseWindowsForms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>HermesVaultManager</AssemblyName>
-    <RootNamespace>HermesVaultManager</RootNamespace>
+    <AssemblyName>VaultForge</AssemblyName>
+    <RootNamespace>VaultForge</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Product>Hermes Vault Manager</Product>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <Product>VaultForge</Product>
     <Company>irgun.web.id</Company>
     <Description>Modern lightweight GUI for the Hermes vault (PowerShell bridge).</Description>
     <Copyright>© 2026 Iriyan Gunawan</Copyright>
@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="vault_bridge.ps1" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="vault_helper.py" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="vaultforge_bridge.ps1" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="vaultforge_helper.py" CopyToOutputDirectory="PreserveNewest" />
     <None Update="README.md" CopyToOutputDirectory="Never" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal sealed class VaultItem
     {

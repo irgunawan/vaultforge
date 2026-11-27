@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>VaultForge Mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #070b14; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+  }
+  .app {
+    position: relative; width: 1440px; height: 900px; overflow: hidden;
+    background:
+      radial-gradient(900px 500px at 92% 88%, rgba(16,185,129,.10), transparent 60%),
+      radial-gradient(700px 420px at 15% 0%, rgba(124,58,237,.10), transparent 60%),
+      #0b1120;
+    border: 1px solid #1f2a3a;
+    box-shadow: 0 40px 120px rgba(0,0,0,.65);
+  }
+
+  /* Anvil watermark */
+  .anvil {
+    position: absolute; right: -110px; bottom: -70px; width: 980px; height: 740px;
+    background: url("anvil.jpg") center center / cover no-repeat;
+    filter: grayscale(1) brightness(.55) contrast(1.35);
+    opacity: .18;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 62% 52%, #000 32%, transparent 78%);
+    mask-image: radial-gradient(ellipse 62% 58% at 62% 52%, #000 32%, transparent 78%);
+    pointer-events: none;
+  }
+  .anvil-glow {
+    position: absolute; right: 40px; bottom: 60px; width: 620px; height: 380px;
+    background: radial-gradient(ellipse at center, rgba(16,185,129,.10), transparent 65%);
+    filter: blur(20px); pointer-events: none;
+  }
+  .spark {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: #fbbf24; box-shadow: 0 0 12px 3px rgba(251,191,36,.45);
+    opacity: .55;
+  }
+  .s1 { left: 1030px; bottom: 250px; } .s2 { left: 1120px; bottom: 330px; }
+  .s3 { left: 930px; bottom: 180px; } .s4 { left: 1210px; bottom: 210px; }
+
+  /* Top bar */
+  .topbar {
+    position: relative; height: 74px; display: flex; align-items: center;
+    padding: 0 26px; border-bottom: 1px solid rgba(36,50,68,.75);
+    background: linear-gradient(180deg, rgba(17,24,39,.72), rgba(11,17,32,.25));
+    backdrop-filter: blur(6px);
+  }
+  .mark {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(145deg, #10b981, #047857);
+    display: grid; place-items: center; margin-right: 14px;
+    box-shadow: 0 8px 24px rgba(16,185,129,.25);
+    font-size: 22px; color: #ecfdf5;
+  }
+  .brand { display: flex; flex-direction: column; line-height: 1.05; }
+  .brand b {
+    font-family: "Consolas", "Cascadia Mono", monospace;
+    font-size: 24px; letter-spacing: .14em;
+    background: linear-gradient(90deg, #ecfdf5, #10b981);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand span { font-size: 10px; letter-spacing: .24em; color: #64748b; margin-top: 5px; }
+  .live {
+    margin-left: 22px; display: inline-flex; align-items: center; gap: 7px;
+    font-family: Consolas, monospace; font-size: 10px; color: #34d399;
+    border: 1px solid rgba(16,185,129,.25); background: rgba(6,78,59,.25);
+    padding: 5px 9px; border-radius: 999px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; }
+  .window-btns { margin-left: auto; display: flex; gap: 8px; }
+  .wbtn {
+    width: 40px; height: 30px; border-radius: 7px; display: grid; place-items: center;
+    background: #1e293b; color: #cbd5e1; font-size: 13px; border: 1px solid #263447;
+  }
+  .wbtn.close { background: #7f1d1d; border-color: #991b1b; color: #fecaca; }
+
+  /* Layout */
+  .content {
+    position: relative; display: grid; grid-template-columns: 410px 1fr;
+    gap: 22px; padding: 22px 26px 16px;
+    height: calc(100% - 108px);
+    align-items: stretch;
+  }
+  .rightcol { display: flex; flex-direction: column; min-height: 0; }
+  .card {
+    height: 100%;
+    background: linear-gradient(180deg, rgba(17,24,39,.92), rgba(13,20,34,.92));
+    border: 1px solid rgba(36,50,68,.95);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.02);
+    backdrop-filter: blur(8px);
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px 12px; border-bottom: 1px solid rgba(36,50,68,.7);
+  }
+  .card-head h2 { margin: 0; font-size: 16px; letter-spacing: .01em; }
+  .chip {
+    font-family: Consolas, monospace; font-size: 9px; letter-spacing: .12em;
+    color: #a78bfa; border: 1px solid rgba(124,58,237,.35);
+    background: rgba(76,29,149,.22); padding: 5px 8px; border-radius: 999px;
+  }
+
+  /* Form */
+  .form { padding: 16px 20px 18px; }
+  .field { margin-bottom: 11px; }
+  .field label {
+    display: block; color: #94a3b8; font-size: 10px; font-weight: 700;
+    letter-spacing: .04em; margin-bottom: 5px;
+  }
+  .input {
+    height: 34px; border-radius: 7px; border: 1px solid #263447;
+    background: #0f172a; display: flex; align-items: center;
+    padding: 0 11px; color: #cbd5e1; font-family: Consolas, monospace; font-size: 12px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+  }
+  .input .ph { color: #475569; }
+  .input .eye { margin-left: auto; color: #64748b; font-size: 13px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn {
+    height: 38px; border-radius: 8px; display: grid; place-items: center;
+    font-size: 11px; font-weight: 800; letter-spacing: .06em; color: #ecfdf5;
+    background: linear-gradient(180deg, #10b981, #059669);
+    box-shadow: 0 8px 22px rgba(16,185,129,.22), inset 0 1px 0 rgba(255,255,255,.18);
+  }
+  .btn.ghost {
+    background: #1e293b; color: #cbd5e1; box-shadow: none;
+    border: 1px solid #2b3a4e; margin-top: 8px;
+  }
+  .hint { margin-top: 12px; color: #64748b; font-size: 10px; line-height: 1.5; }
+
+  /* Table */
+  .vault-card { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .vault-card .table { flex: 1; }
+  .table { padding: 4px 12px 10px; }
+  .thead, .trow {
+    display: grid; grid-template-columns: 1.15fr .55fr 1.2fr 1.15fr 1.25fr;
+    gap: 10px; align-items: center; padding: 9px 8px;
+  }
+  .thead {
+    color: #64748b; font-family: Consolas, monospace; font-size: 9px;
+    letter-spacing: .13em; border-bottom: 1px solid rgba(36,50,68,.7);
+  }
+  .trow {
+    border-bottom: 1px solid rgba(36,50,68,.38); font-size: 11px; color: #cbd5e1;
+  }
+  .trow .h { font-family: Consolas, monospace; color: #34d399; font-size: 10px; }
+  .trow .k {
+    font-family: Consolas, monospace; font-size: 9px; color: #a78bfa;
+    background: rgba(76,29,149,.16); border: 1px solid rgba(124,58,237,.22);
+    padding: 2px 6px; border-radius: 999px; width: max-content;
+  }
+  .trow .o { color: #64748b; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Process gauges */
+  .proc-card { margin-top: 18px; flex: none; height: auto; }
+  .proc-head { display: flex; align-items: baseline; gap: 10px; }
+  .proc-head small { color: #64748b; font-size: 10px; }
+  .gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 10px 18px 18px; }
+  .gauge {
+    position: relative; border: 1px solid rgba(36,50,68,.8); border-radius: 12px;
+    background: linear-gradient(180deg, rgba(15,23,42,.9), rgba(10,16,28,.9));
+    padding: 14px 12px 12px; display: flex; align-items: center; gap: 12px;
+  }
+  .dial {
+    width: 76px; height: 76px; border-radius: 50%; position: relative; flex: none;
+    background: conic-gradient(var(--c) calc(var(--v) * 1%), #1e293b 0);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--c) 22%, transparent);
+  }
+  .dial::before {
+    content: ""; position: absolute; inset: 8px; border-radius: 50%;
+    background: #0d1422; border: 1px solid #263447;
+  }
+  .dial span {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: Consolas, monospace; font-size: 16px; font-weight: 700; color: var(--c);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--c) 35%, transparent);
+  }
+  .gmeta { min-width: 0; }
+  .gmeta b { display: block; font-family: Consolas, monospace; font-size: 11px; color: #e2e8f0; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gmeta .sub { font-size: 9px; color: #64748b; font-family: Consolas, monospace; }
+  .gmeta .mem { margin-top: 7px; font-size: 9px; color: #94a3b8; font-family: Consolas, monospace; }
+  .bar { height: 3px; border-radius: 999px; background: #1e293b; margin-top: 7px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: var(--v); background: var(--c); border-radius: 999px; }
+
+  /* Status */
+  .statusbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+    background: rgba(8,13,25,.92); border-top: 1px solid rgba(36,50,68,.8);
+    display: flex; align-items: center; padding: 0 26px; gap: 12px;
+    font-family: Consolas, monospace; font-size: 9px; color: #64748b;
+  }
+  .statusbar .ok { color: #34d399; }
+  .statusbar .right { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="anvil"></div>
+  <div class="anvil-glow"></div>
+  <div class="spark s1"></div><div class="spark s2"></div><div class="spark s3"></div><div class="spark s4"></div>
+
+  <div class="topbar">
+    <div class="mark">⚒</div>
+    <div class="brand">
+      <b>VAULTFORGE</b>
+      <span>HERMES VAULT · POWERSHELL BRIDGE</span>
+    </div>
+    <div class="live"><span class="dot"></span> HERMES AKTIF</div>
+    <div class="window-btns">
+      <div class="wbtn">⚙</div>
+      <div class="wbtn">⛶</div>
+      <div class="wbtn">▣</div>
+      <div class="wbtn">—</div>
+      <div class="wbtn close">✕</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <section class="card">
+      <div class="card-head">
+        <h2>Tambah Login</h2>
+        <span class="chip">BRIDGE READY</span>
+      </div>
+      <div class="form">
+        <div class="field"><label>LABEL</label><div class="input">GitHub work account</div></div>
+        <div class="field"><label>SITE ORIGIN</label><div class="input">https://github.com</div></div>
+        <div class="row2">
+          <div class="field"><label>IDENTIFIER TYPE</label><div class="input">email</div></div>
+          <div class="field"><label>IDENTIFIER</label><div class="input">irgunawan@…</div></div>
+        </div>
+        <div class="field"><label>PASSWORD</label><div class="input"><span class="ph">••••••••••••••••</span><span class="eye">◉</span></div></div>
+        <div class="field"><label>AUTHENTICATOR KEY <span style="color:#475569">(OPSIONAL)</span></label><div class="input"><span class="ph">otpauth:// atau seed base32</span></div></div>
+        <div class="btn">SIMPAN KE VAULT</div>
+        <div class="btn ghost">BERSIHKAN</div>
+        <div class="hint">Password tidak pernah ditampilkan kembali. Vault memakai kunci lokal Hermes.</div>
+      </div>
+    </section>
+
+    <section class="rightcol">
+      <div class="card vault-card">
+        <div class="card-head">
+          <h2>Item Vault</h2>
+          <span class="chip">12 ITEM</span>
+        </div>
+        <div class="table">
+          <div class="thead"><span>HANDLE</span><span>KIND</span><span>LABEL</span><span>IDENTIFIER</span><span>ORIGIN</span></div>
+          <div class="trow"><span class="h">vault_d91242573621</span><span class="k">login</span><span>webminsmd</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_d2ac1fe08762</span><span class="k">login</span><span>portalpoc</span><span>OC62IRG</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+          <div class="trow"><span class="h">vault_604833120d33</span><span class="k">login</span><span>PMA</span><span>root</span><span class="o">https://pma.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_2a2ffc91c045</span><span class="k">login</span><span>portalMEL</span><span>OC62MEL</span><span class="o">https://portal.pocindonesia.web.id</span></div>
+          <div class="trow"><span class="h">vault_2d1a62999e24</span><span class="k">login</span><span>cloudflare</span><span>tepianloop@gmail.com</span><span class="o">https://dash.cloudflare.com</span></div>
+          <div class="trow"><span class="h">vault_37105f2ca94e</span><span class="k">login</span><span>Instagram</span><span>tepianloop</span><span class="o">https://instagram.com</span></div>
+          <div class="trow"><span class="h">vault_61b8fe0e43da</span><span class="k">login</span><span>WebminPusda</span><span>irgunawan</span><span class="o">https://webadmin.pocindonesia.com</span></div>
+          <div class="trow"><span class="h">vault_58debfdf02b4</span><span class="k">login</span><span>PortalIrgun</span><span>OC62IRG</span><span class="o">https://portal.irgun.web.id</span></div>
+          <div class="trow"><span class="h">vault_631d93279178</span><span class="k">login</span><span>spacehost</span><span>indonesiapoc9@gmail.com</span><span class="o">https://ai.spacehost.co.id</span></div>
+          <div class="trow"><span class="h">vault_842546f44968</span><span class="k">login</span><span>QWORDS</span><span>tepianloop@gmail.com</span><span class="o">https://portal.qwords.com</span></div>
+        </div>
+      </div>
+
+      <div class="card proc-card">
+        <div class="card-head proc-head">
+          <h2>Proses Terberat</h2>
+          <small>saat Hermes bekerja · top 3 CPU</small>
+          <span class="chip" style="margin-left:auto">LIVE 2s</span>
+        </div>
+        <div class="gauges">
+          <div class="gauge" style="--v:42;--c:#10b981">
+            <div class="dial"><span>42%</span></div>
+            <div class="gmeta"><b>hermes-gateway</b><div class="sub">PID 4182 · python</div><div class="mem">RAM 318 MB</div><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:23;--c:#f59e0b">
+            <div class="dial"><span>23%</span></div>
+            <div class="gmeta"><b>chromium</b><div class="sub">PID 5127 · browser-use</div><div class="mem">RAM 604 MB</div><div class="bar"><i></i></div></div>
+          </div>
+          <div class="gauge" style="--v:18;--c:#a78bfa">
+            <div class="dial"><span>18%</span></div>
+            <div class="gmeta"><b>python</b><div class="sub">PID 6071 · vault bridge</div><div class="mem">RAM 96 MB</div><div class="bar"><i></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="statusbar">
+    <span class="ok">●</span> Vault siap · PowerShell bridge terhubung
+    <span class="right">v1.0.1 · irgun.web.id · Windows 10/11</span>
+  </div>
+</div>
+</body>
+</html>

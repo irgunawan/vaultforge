@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web.Script.Serialization;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal sealed class AppSettings
     {
@@ -23,7 +23,7 @@ namespace HermesVaultManager
             {
                 return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "HermesVaultManager");
+                    "VaultForge");
             }
         }
 
@@ -32,14 +32,29 @@ namespace HermesVaultManager
             get { return Path.Combine(SettingsDir, "settings.json"); }
         }
 
+        private static string LegacySettingsFile
+        {
+            get
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "HermesVaultManager", "settings.json");
+            }
+        }
+
         public static AppSettings Load()
         {
             AppSettings s = null;
             try
             {
-                if (File.Exists(SettingsFile))
+                string source = SettingsFile;
+                if (!File.Exists(source) && File.Exists(LegacySettingsFile))
                 {
-                    var json = File.ReadAllText(SettingsFile);
+                    source = LegacySettingsFile;
+                }
+                if (File.Exists(source))
+                {
+                    var json = File.ReadAllText(source);
                     s = new JavaScriptSerializer().Deserialize<AppSettings>(json);
                 }
             }

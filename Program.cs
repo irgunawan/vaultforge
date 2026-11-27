@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Windows.Forms;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal static class Program
     {
@@ -15,14 +15,14 @@ namespace HermesVaultManager
 
             Application.ThreadException += (s, e) =>
             {
-                MessageBox.Show(e.Exception.Message, "Hermes Vault Manager",
+                MessageBox.Show(e.Exception.Message, "VaultForge",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             };
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
                 var ex = e.ExceptionObject as Exception;
                 MessageBox.Show(ex != null ? ex.Message : "Terjadi error tak terduga.",
-                    "Hermes Vault Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    "VaultForge", MessageBoxButtons.OK, MessageBoxIcon.Error);
             };
 
             Application.Run(new MainForm());

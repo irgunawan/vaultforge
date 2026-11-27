@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Web.Script.Serialization;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal sealed class VaultService
     {
@@ -20,7 +20,7 @@ namespace HermesVaultManager
 
         public string BridgeScript
         {
-            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vault_bridge.ps1"); }
+            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vaultforge_bridge.ps1"); }
         }
 
         public VaultResult AddLogin(string label, string origin, string identifierType,
@@ -62,7 +62,7 @@ namespace HermesVaultManager
             {
                 if (!File.Exists(BridgeScript))
                 {
-                    result.Error = "vault_bridge.ps1 tidak ditemukan di folder aplikasi.";
+                    result.Error = "vaultforge_bridge.ps1 tidak ditemukan di folder aplikasi.";
                     return result;
                 }
 

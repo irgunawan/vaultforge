@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace HermesVaultManager
+namespace VaultForge
 {
     internal sealed class SettingsForm : Form
     {

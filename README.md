@@ -1,4 +1,4 @@
-# Hermes Vault Manager
+# VaultForge
 
 A lightweight Windows 10/11 GUI for the Hermes local vault. It runs through a
 PowerShell bridge and calls the same `agent.vault_store` API that
@@ -35,7 +35,7 @@ The MSI is built from `installer/product.wxs`. On Windows, use WiX Toolset 3.x:
 
 ```powershell
 candle installer\product.wxs
-light -ext WixUIExtension -o HermesVaultManager-1.0.0.msi product.wixobj
+light -ext WixUIExtension -o VaultForge-1.0.1.msi product.wixobj
 ```
 
 The checked-in `installer/product.wxs` was also built on Linux with `wixl`.

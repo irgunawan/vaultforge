@@ -16,9 +16,9 @@ if (-not [string]::IsNullOrWhiteSpace($HermesHome)) {
 }
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$helper = Join-Path $scriptDir 'vault_helper.py'
+$helper = Join-Path $scriptDir 'vaultforge_helper.py'
 if (-not (Test-Path -LiteralPath $helper)) {
-    Write-Error "vault_helper.py tidak ditemukan di $scriptDir"
+    Write-Error "vaultforge_helper.py tidak ditemukan di $scriptDir"
     exit 2
 }
 
