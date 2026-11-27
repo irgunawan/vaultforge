@@ -9,9 +9,9 @@
     <RootNamespace>VaultForge</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.4</Version>
-    <FileVersion>1.0.4.0</FileVersion>
-    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <Version>1.0.5</Version>
+    <FileVersion>1.0.5.0</FileVersion>
+    <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <Product>VaultForge</Product>
     <Company>irgun.web.id</Company>
     <Description>Modern lightweight GUI for the Hermes vault (PowerShell bridge).</Description>

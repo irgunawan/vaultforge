@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web.Script.Serialization;
 
 namespace VaultForge
@@ -71,20 +72,22 @@ namespace VaultForge
                 s = new AppSettings();
             }
 
-            if (string.IsNullOrWhiteSpace(s.HermesHome))
-            {
-                s.HermesHome = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".hermes");
-            }
-
             if (string.IsNullOrWhiteSpace(s.HermesExe))
             {
                 s.HermesExe = FindOnPath("hermes.exe") ?? FindOnPath("hermes") ?? "hermes.exe";
             }
 
+            if (string.IsNullOrWhiteSpace(s.HermesHome))
+            {
+                s.HermesHome = HermesRoot(s.HermesExe)
+                    ?? Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".hermes");
+            }
+
             if (string.IsNullOrWhiteSpace(s.PythonExe))
             {
-                s.PythonExe = FindSiblingPython(s.HermesExe) ?? FindOnPath("python.exe") ?? "python.exe";
+                s.PythonExe = FindHermesPython(s.HermesExe, s.HermesHome)
+                    ?? FindOnPath("python.exe") ?? "python.exe";
             }
 
             return s;
@@ -101,6 +104,66 @@ namespace VaultForge
             catch
             {
             }
+        }
+
+        private static string HermesRoot(string hermesExe)
+        {
+            try
+            {
+                var dir = new DirectoryInfo(Path.GetDirectoryName(hermesExe) ?? "");
+                while (dir != null)
+                {
+                    if (File.Exists(Path.Combine(dir.FullName, "config.yaml")))
+                        return dir.FullName;
+                    dir = dir.Parent;
+                }
+            }
+            catch
+            {
+            }
+            return null;
+        }
+
+        private static string FindHermesPython(string hermesExe, string hermesHome)
+        {
+            string sibling = FindSiblingPython(hermesExe);
+            if (!string.IsNullOrWhiteSpace(sibling)) return sibling;
+
+            string root = hermesHome;
+            if (string.IsNullOrWhiteSpace(root)) root = HermesRoot(hermesExe);
+            if (!string.IsNullOrWhiteSpace(root))
+            {
+                string installs = Path.Combine(root, "installs");
+                if (Directory.Exists(installs))
+                {
+                    try
+                    {
+                        string best = Directory.GetFiles(installs, "python.exe", SearchOption.AllDirectories)
+                            .Where(p => p.IndexOf("venv\\Scripts\\", StringComparison.OrdinalIgnoreCase) >= 0)
+                            .OrderByDescending(p => Directory.GetLastWriteTimeUtc(Path.GetDirectoryName(p) ?? ""))
+                            .FirstOrDefault();
+                        if (best != null) return best;
+                    }
+                    catch
+                    {
+                    }
+                }
+                string tools = Path.Combine(root, "tools");
+                if (Directory.Exists(tools))
+                {
+                    try
+                    {
+                        string best = Directory.GetFiles(tools, "python.exe", SearchOption.AllDirectories)
+                            .OrderByDescending(p => File.GetLastWriteTimeUtc(p))
+                            .FirstOrDefault();
+                        if (best != null) return best;
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            return null;
         }
 
         private static string FindSiblingPython(string hermesExe)

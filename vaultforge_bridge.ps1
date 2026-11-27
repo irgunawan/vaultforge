@@ -32,6 +32,31 @@ if (-not (Test-Path -LiteralPath $Python)) {
     $Python = $cmd.Source
 }
 
+function Test-AgentPython([string]$candidate) {
+    try {
+        & $candidate -c "import agent" 2>$null | Out-Null
+        return ($LASTEXITCODE -eq 0)
+    } catch {
+        return $false
+    }
+}
+
+if (-not (Test-AgentPython $Python)) {
+    $root = if (-not [string]::IsNullOrWhiteSpace($HermesHome)) { $HermesHome } else { Join-Path $env:LOCALAPPDATA 'hermes' }
+    $installs = Join-Path $root 'installs'
+    if (Test-Path -LiteralPath $installs) {
+        $candidates = Get-ChildItem -LiteralPath $installs -Recurse -Filter 'python.exe' -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match 'venv[\\/]Scripts' } |
+            Sort-Object LastWriteTime -Descending
+        foreach ($c in $candidates) {
+            if (Test-AgentPython $c.FullName) {
+                $Python = $c.FullName
+                break
+            }
+        }
+    }
+}
+
 $argsList = @($helper, $Action)
 if (-not [string]::IsNullOrWhiteSpace($InputFile)) {
     $argsList += $InputFile

@@ -4,6 +4,7 @@
 Never prints secret values; only metadata and the new handle.
 """
 import json
+import os
 import sys
 
 
@@ -11,6 +12,30 @@ def emit(obj):
     sys.stdout.write(json.dumps(obj, ensure_ascii=False))
     sys.stdout.flush()
     raise SystemExit(0)
+
+
+def ensure_agent_importable():
+    try:
+        import agent.vault_store  # noqa: F401
+        return
+    except ImportError:
+        pass
+    home = os.environ.get("HERMES_HOME") or ""
+    roots = []
+    if home:
+        roots.extend([
+            os.path.join(home, "hermes-agent"),
+            os.path.join(home, "hermes-agent", "tree"),
+        ])
+        installs = os.path.join(home, "installs")
+        if os.path.isdir(installs):
+            for base, dirs, files in os.walk(installs):
+                if "agent" in dirs and os.path.isfile(os.path.join(base, "agent", "vault_store.py")):
+                    roots.append(base)
+                    dirs[:] = []
+    for root in roots:
+        if root and root not in sys.path:
+            sys.path.insert(0, root)
 
 
 def main():
@@ -24,6 +49,7 @@ def main():
             payload = json.load(fh)
 
     try:
+        ensure_agent_importable()
         from agent.vault_store import get_vault_store
 
         store = get_vault_store()
