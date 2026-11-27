@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="VaultForge" Language="1033" Version="1.0.3"
+  <Product Id="*" Name="VaultForge" Language="1033" Version="1.0.4"
            Manufacturer="irgun.web.id" UpgradeCode="799C6EB4-A5CE-4318-8FBF-3E484755952E">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
     <MajorUpgrade DowngradeErrorMessage="Versi VaultForge yang lebih baru sudah terpasang."/>
@@ -14,19 +14,19 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLDIR" Name="VaultForge">
-          <Component Id="MainExe" Guid="7777409D-AAE5-4064-BFD7-9DA4315F6C87" Win64="no">
+          <Component Id="MainExe" Guid="{C7363C68-6E2D-412F-9D32-B4CB682F129B}" Win64="no">
             <File Id="MainExeFile" Source="publish/VaultForge.exe" KeyPath="yes">
               <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuDir" Name="VaultForge" WorkingDirectory="INSTALLDIR" Icon="AppIcon" Advertise="yes"/>
               <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="VaultForge" WorkingDirectory="INSTALLDIR" Icon="AppIcon" Advertise="yes"/>
             </File>
           </Component>
-          <Component Id="ConfigFile" Guid="0048A7CF-5120-4782-855A-CB269C5D7E99" Win64="no">
+          <Component Id="ConfigFile" Guid="{03A9633C-B3DE-48BC-B692-40BD8D5B0BC3}" Win64="no">
             <File Id="ConfigFileFile" Source="publish/VaultForge.exe.config" KeyPath="yes"/>
           </Component>
-          <Component Id="BridgeScript" Guid="10F2705B-D379-4268-A94E-B7DBC52D715D" Win64="no">
+          <Component Id="BridgeScript" Guid="{D9D27C1D-20D0-438D-B5DE-F055717C1A22}" Win64="no">
             <File Id="BridgeScriptFile" Source="publish/vaultforge_bridge.ps1" KeyPath="yes"/>
           </Component>
-          <Component Id="HelperScript" Guid="F03E4223-78A3-4327-8C68-98FB898320CB" Win64="no">
+          <Component Id="HelperScript" Guid="{0438274B-26EC-4533-9803-975695362901}" Win64="no">
             <File Id="HelperScriptFile" Source="publish/vaultforge_helper.py" KeyPath="yes"/>
           </Component>
         </Directory>

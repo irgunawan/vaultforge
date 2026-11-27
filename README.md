@@ -40,11 +40,11 @@ The MSI is built from `installer/product.wxs`. On Windows, use WiX Toolset 3.x:
 
 ```powershell
 candle installer\product.wxs
-light -ext WixUIExtension -o VaultForge-1.0.3.msi product.wixobj
+light -ext WixUIExtension -o VaultForge-1.0.4.msi product.wixobj
 ```
 
 The checked-in `installer/product.wxs` was also built on Linux with `wixl`.
-Publish `VaultForge-1.0.3.msi.sha256` beside the MSI on GitHub Releases so OTA
+Publish `VaultForge-1.0.4.msi.sha256` beside the MSI on GitHub Releases so OTA
 can verify the download before installing.
 
 ## Security
