@@ -11,6 +11,7 @@ namespace VaultForge
         private TextBox _pythonBox;
         private TextBox _homeBox;
         private CheckBox _updatesBox;
+        private CheckBox _autoBox;
 
         public SettingsForm(AppSettings settings)
         {
@@ -63,6 +64,17 @@ namespace VaultForge
             };
             grid.Controls.Add(_updatesBox, 1, 3);
 
+            _autoBox = new CheckBox
+            {
+                Text = "Pasang update otomatis (OTA) saat tersedia",
+                Checked = settings.AutoInstallUpdates,
+                ForeColor = Theme.Text,
+                Font = Theme.Ui(9.5f),
+                AutoSize = true,
+                Margin = new Padding(0, 6, 0, 0)
+            };
+            grid.Controls.Add(_autoBox, 1, 4);
+
             var hint = new Label
             {
                 Text = "Python harus bisa mengimpor paket agent Hermes. Biasanya python.exe ada di folder yang sama dengan hermes.exe.",
@@ -70,9 +82,9 @@ namespace VaultForge
                 Font = Theme.Ui(8.5f),
                 AutoSize = true,
                 MaximumSize = new Size(500, 0),
-                Margin = new Padding(0, 14, 0, 0)
+                Margin = new Padding(0, 10, 0, 0)
             };
-            grid.Controls.Add(hint, 1, 4);
+            grid.Controls.Add(hint, 1, 5);
 
             var buttons = new FlowLayoutPanel
             {
@@ -155,6 +167,7 @@ namespace VaultForge
             _settings.PythonExe = _pythonBox.Text.Trim();
             _settings.HermesHome = _homeBox.Text.Trim();
             _settings.CheckUpdates = _updatesBox.Checked;
+            _settings.AutoInstallUpdates = _autoBox.Checked;
             _settings.Save();
             DialogResult = DialogResult.OK;
             Close();

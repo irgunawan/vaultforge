@@ -57,7 +57,17 @@ namespace VaultForge
                                     name.EndsWith(".msi", StringComparison.OrdinalIgnoreCase))
                                 {
                                     info.MsiUrl = GetString(asset, "browser_download_url");
-                                    break;
+                                    object sizeObj;
+                                    if (asset.TryGetValue("size", out sizeObj) && sizeObj != null)
+                                    {
+                                        try { info.MsiSize = Convert.ToInt64(sizeObj); }
+                                        catch { info.MsiSize = 0; }
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(name) &&
+                                         name.EndsWith(".sha256", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    info.MsiShaUrl = GetString(asset, "browser_download_url");
                                 }
                             }
                         }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="VaultForge" Language="1033" Version="1.0.1"
+  <Product Id="*" Name="VaultForge" Language="1033" Version="1.0.2"
            Manufacturer="irgun.web.id" UpgradeCode="799C6EB4-A5CE-4318-8FBF-3E484755952E">
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
     <MajorUpgrade DowngradeErrorMessage="Versi VaultForge yang lebih baru sudah terpasang."/>

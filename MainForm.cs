@@ -9,7 +9,7 @@ namespace VaultForge
 {
     internal sealed class MainForm : Form
     {
-        private const string AppVersion = "1.0.1";
+        private const string AppVersion = "1.0.2";
 
         private readonly AppSettings _settings;
         private VaultService _vault;
@@ -27,6 +27,8 @@ namespace VaultForge
         private FlatButton _refreshButton;
         private FlatButton _deleteButton;
         private FlatButton _checkUpdateButton;
+        private FlatButton _otaButton;
+        private UpdateInfo _latestInfo;
         private bool _fullscreen;
         private Rectangle _restoreBounds;
 
@@ -101,15 +103,31 @@ namespace VaultForge
                 TextAlign = ContentAlignment.MiddleLeft,
                 Text = ""
             };
-            var downloadButton = new FlatButton("UNDUH UPDATE", Theme.Accent, Theme.AccentDark)
+            var updateButtons = new FlowLayoutPanel
             {
                 Dock = DockStyle.Right,
-                Width = 150,
+                AutoSize = true,
+                FlowDirection = FlowDirection.RightToLeft,
+                BackColor = Color.Transparent,
+                Margin = Padding.Empty,
+                Padding = Padding.Empty
+            };
+            _otaButton = new FlatButton("UPDATE OTA", Theme.Accent, Theme.AccentDark)
+            {
+                Width = 122,
                 Height = 28
             };
-            downloadButton.Click += (s, e) => OpenUpdate();
+            _otaButton.Click += (s, e) => StartOta();
+            var manualButton = new FlatButton("UNDUH", Theme.Surface2, Color.FromArgb(51, 65, 85))
+            {
+                Width = 70,
+                Height = 28
+            };
+            manualButton.Click += (s, e) => OpenUpdate();
+            updateButtons.Controls.Add(_otaButton);
+            updateButtons.Controls.Add(manualButton);
             _updateBanner.Controls.Add(_updateLabel);
-            _updateBanner.Controls.Add(downloadButton);
+            _updateBanner.Controls.Add(updateButtons);
 
             Controls.Add(content);
             Controls.Add(status);
@@ -575,9 +593,11 @@ namespace VaultForge
                     var info = t.Result;
                     if (info.Available)
                     {
+                        _latestInfo = info;
                         _updateBanner.Visible = true;
-                        _updateLabel.Text = "Update tersedia: v" + info.Version + " — klik UNDUH UPDATE";
+                        _updateLabel.Text = "Update v" + info.Version + " tersedia — klik UPDATE OTA";
                         SetStatus("Update v" + info.Version + " tersedia di GitHub.", Theme.Accent);
+                        if (_settings.AutoInstallUpdates) StartOta();
                     }
                     else if (manual)
                     {
@@ -594,11 +614,47 @@ namespace VaultForge
             });
         }
 
+        private void StartOta()
+        {
+            if (_latestInfo == null || string.IsNullOrWhiteSpace(_latestInfo.MsiUrl))
+            {
+                SetStatus("Info update belum tersedia. Klik CEK UPDATE dulu.", Theme.Warning);
+                return;
+            }
+            _otaButton.Enabled = false;
+            SetStatus("Menyiapkan update OTA...", Theme.Muted);
+            var progress = new Progress<string>(text =>
+            {
+                _updateLabel.Text = text;
+                SetStatus(text, Theme.Muted);
+            });
+
+            OtaUpdater.InstallAsync(_latestInfo, progress).ContinueWith(t =>
+            {
+                BeginInvoke((Action)(() =>
+                {
+                    var result = t.Result;
+                    if (result.Ok)
+                    {
+                        _updateLabel.Text = "Installer siap. Menutup VaultForge untuk pemasangan...";
+                        SetStatus("Memasang update v" + _latestInfo.Version + "...", Theme.Accent);
+                        Application.Exit();
+                    }
+                    else
+                    {
+                        _otaButton.Enabled = true;
+                        _updateLabel.Text = "Update gagal: " + FirstLine(result.Error);
+                        SetStatus("Update gagal: " + FirstLine(result.Error), Theme.Danger);
+                    }
+                }));
+            });
+        }
+
         private void OpenUpdate()
         {
             try
             {
-                var info = UpdateChecker.Check(AppVersion);
+                var info = _latestInfo ?? UpdateChecker.Check(AppVersion);
                 string url = !string.IsNullOrWhiteSpace(info.MsiUrl) ? info.MsiUrl : info.ReleaseUrl;
                 if (!string.IsNullOrWhiteSpace(url)) Process.Start(url);
             }

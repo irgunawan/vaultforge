@@ -11,7 +11,9 @@ PowerShell bridge and calls the same `agent.vault_store` API that
 - Delete an item by handle.
 - Password is passed through a temporary JSON file and is never placed on the command line.
 - Window controls: fullscreen, 1/16 screen size, minimize, resize.
-- Checks GitHub Releases for a newer `.msi` and offers the download.
+- Over-the-air (OTA) updates: downloads the released `.msi`, verifies its size
+  and SHA-256 checksum, then silently installs it and restarts the app. A manual
+  download button is kept as fallback; auto-install can be enabled in Settings.
 
 ## Requirements
 
@@ -35,10 +37,12 @@ The MSI is built from `installer/product.wxs`. On Windows, use WiX Toolset 3.x:
 
 ```powershell
 candle installer\product.wxs
-light -ext WixUIExtension -o VaultForge-1.0.1.msi product.wixobj
+light -ext WixUIExtension -o VaultForge-1.0.2.msi product.wixobj
 ```
 
 The checked-in `installer/product.wxs` was also built on Linux with `wixl`.
+Publish `VaultForge-1.0.2.msi.sha256` beside the MSI on GitHub Releases so OTA
+can verify the download before installing.
 
 ## Security
 

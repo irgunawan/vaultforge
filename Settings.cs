@@ -11,10 +11,12 @@ namespace VaultForge
         public string PythonExe { get; set; }
         public string HermesHome { get; set; }
         public bool CheckUpdates { get; set; }
+        public bool AutoInstallUpdates { get; set; }
 
         public AppSettings()
         {
             CheckUpdates = true;
+            AutoInstallUpdates = false;
         }
 
         private static string SettingsDir

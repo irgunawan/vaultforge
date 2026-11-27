@@ -31,6 +31,8 @@ namespace VaultForge
         public string Version { get; set; }
         public string ReleaseUrl { get; set; }
         public string MsiUrl { get; set; }
+        public long MsiSize { get; set; }
+        public string MsiShaUrl { get; set; }
         public string Notes { get; set; }
         public string Error { get; set; }
     }
