@@ -9,7 +9,7 @@ namespace VaultForge
 {
     internal sealed class MainForm : Form
     {
-        private const string AppVersion = "1.0.6";
+        private const string AppVersion = "1.0.7";
 
         private readonly AppSettings _settings;
         private VaultService _vault;

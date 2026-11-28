@@ -5,5 +5,5 @@ Set-Location $root
 
 dotnet publish -c Release -o publish
 candle installer\product.wxs -out product.wixobj
-light -ext WixUIExtension -out VaultForge-1.0.6.msi product.wixobj
-Write-Host "MSI: $root\VaultForge-1.0.6.msi"
+light -ext WixUIExtension -out VaultForge-1.0.7.msi product.wixobj
+Write-Host "MSI: $root\VaultForge-1.0.7.msi"

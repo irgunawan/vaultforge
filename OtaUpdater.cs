@@ -19,38 +19,47 @@ namespace VaultForge
         public static async Task<Result> InstallAsync(UpdateInfo info, IProgress<string> progress)
         {
             var result = new Result();
-            string msi = Path.Combine(Path.GetTempPath(), "VaultForge-" + info.Version + ".msi");
-            string checksum = msi + ".sha256";
+            bool portable = PortableRuntime.IsPortable;
+            string fileName = portable ? "VaultForge.exe" : "VaultForge-" + info.Version + ".msi";
+            string download = Path.Combine(Path.GetTempPath(), fileName);
+            string checksum = download + ".sha256";
+            string url = portable ? info.ExeUrl : info.MsiUrl;
+            string shaUrl = portable ? info.ExeShaUrl : info.MsiShaUrl;
+            long expectedSize = portable ? info.ExeSize : info.MsiSize;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(info.MsiUrl))
-                    throw new Exception("Tautan installer tidak ditemukan di release GitHub.");
+                if (string.IsNullOrWhiteSpace(url))
+                    throw new Exception(portable
+                        ? "Tautan EXE portable tidak ditemukan di release GitHub."
+                        : "Tautan installer tidak ditemukan di release GitHub.");
 
                 progress.Report("Mengunduh VaultForge v" + info.Version + "...");
-                await DownloadAsync(info.MsiUrl, msi, progress);
+                await DownloadAsync(url, download, progress);
 
-                var file = new FileInfo(msi);
+                var file = new FileInfo(download);
                 if (!file.Exists || file.Length < 1024)
-                    throw new Exception("Installer yang diunduh kosong atau tidak valid.");
-                if (info.MsiSize > 0 && file.Length != info.MsiSize)
-                    throw new Exception("Ukuran installer tidak cocok dengan release GitHub.");
+                    throw new Exception("Berkas yang diunduh kosong atau tidak valid.");
+                if (expectedSize > 0 && file.Length != expectedSize)
+                    throw new Exception("Ukuran unduhan tidak cocok dengan release GitHub.");
 
-                if (!string.IsNullOrWhiteSpace(info.MsiShaUrl))
+                if (!string.IsNullOrWhiteSpace(shaUrl))
                 {
                     progress.Report("Memverifikasi checksum unduhan...");
-                    await DownloadAsync(info.MsiShaUrl, checksum, new Progress<string>());
+                    await DownloadAsync(shaUrl, checksum, new Progress<string>());
                     string expected = File.ReadAllText(checksum).Trim();
                     int space = expected.IndexOf(' ');
                     if (space > 0) expected = expected.Substring(0, space);
                     expected = expected.Trim().ToLowerInvariant();
-                    string actual = Sha256(msi);
+                    string actual = Sha256(download);
                     if (expected.Length != 64 || expected != actual)
-                        throw new Exception("SHA-256 installer tidak cocok. Unduhan dibatalkan.");
+                        throw new Exception("SHA-256 unduhan tidak cocok. Pembaruan dibatalkan.");
                 }
 
-                progress.Report("Menyiapkan pemasangan otomatis...");
-                string script = WriteHelper(msi, Process.GetCurrentProcess().Id, Application.ExecutablePath);
+                progress.Report(portable ? "Menyiapkan penggantian EXE..." : "Menyiapkan pemasangan otomatis...");
+                string script = portable
+                    ? WritePortableHelper(download, Process.GetCurrentProcess().Id, Application.ExecutablePath)
+                    : WriteHelper(download, Process.GetCurrentProcess().Id, Application.ExecutablePath);
 
                 var psi = new ProcessStartInfo(
                     "powershell.exe",
@@ -112,6 +121,22 @@ namespace VaultForge
                 "if ($old) { Start-Process -FilePath \"$env:SystemRoot\\System32\\msiexec.exe\" -ArgumentList @('/x', $old, '/quiet', '/norestart') -Wait }\r\n" +
                 "$p = Start-Process -FilePath \"$env:SystemRoot\\System32\\msiexec.exe\" -ArgumentList @('/i', $msi, '/quiet', '/norestart', '/log', $log) -Wait -PassThru\r\n" +
                 "if ($p.ExitCode -eq 0 -and (Test-Path $exe)) { Start-Process -FilePath $exe }\r\n";
+            File.WriteAllText(path, script, new System.Text.UTF8Encoding(false));
+            return path;
+        }
+
+        private static string WritePortableHelper(string newExe, int appPid, string exe)
+        {
+            string path = Path.Combine(Path.GetTempPath(), "vaultforge-portable-update.ps1");
+            string script =
+                "$appPid = " + appPid + "\r\n" +
+                "$newExe = '" + Ps(newExe) + "'\r\n" +
+                "$exe = '" + Ps(exe) + "'\r\n" +
+                "$deadline = (Get-Date).AddMinutes(2)\r\n" +
+                "while ((Get-Process -Id $appPid -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline) { Start-Sleep -Milliseconds 250 }\r\n" +
+                "$ok = $false\r\n" +
+                "for ($i = 0; $i -lt 40 -and -not $ok; $i++) { try { Copy-Item -LiteralPath $newExe -Destination $exe -Force -ErrorAction Stop; $ok = $true } catch { Start-Sleep -Milliseconds 300 } }\r\n" +
+                "if ($ok) { Start-Process -FilePath $exe }\r\n";
             File.WriteAllText(path, script, new System.Text.UTF8Encoding(false));
             return path;
         }

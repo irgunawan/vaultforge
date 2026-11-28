@@ -26,6 +26,8 @@ namespace VaultForge
         {
             get
             {
+                string exeDir = AppDomain.CurrentDomain.BaseDirectory;
+                if (PortableRuntime.IsWritable(exeDir)) return exeDir;
                 return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "VaultForge");

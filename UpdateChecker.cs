@@ -53,21 +53,33 @@ namespace VaultForge
                                 var asset = entry as Dictionary<string, object>;
                                 if (asset == null) continue;
                                 string name = GetString(asset, "name");
-                                if (!string.IsNullOrEmpty(name) &&
-                                    name.EndsWith(".msi", StringComparison.OrdinalIgnoreCase))
+                                if (string.IsNullOrEmpty(name)) continue;
+                                string url = GetString(asset, "browser_download_url");
+                                object sizeObj;
+                                long size = 0;
+                                if (asset.TryGetValue("size", out sizeObj) && sizeObj != null)
                                 {
-                                    info.MsiUrl = GetString(asset, "browser_download_url");
-                                    object sizeObj;
-                                    if (asset.TryGetValue("size", out sizeObj) && sizeObj != null)
-                                    {
-                                        try { info.MsiSize = Convert.ToInt64(sizeObj); }
-                                        catch { info.MsiSize = 0; }
-                                    }
+                                    try { size = Convert.ToInt64(sizeObj); }
+                                    catch { size = 0; }
                                 }
-                                else if (!string.IsNullOrEmpty(name) &&
-                                         name.EndsWith(".sha256", StringComparison.OrdinalIgnoreCase))
+
+                                if (name.Equals("VaultForge.exe", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    info.MsiShaUrl = GetString(asset, "browser_download_url");
+                                    info.ExeUrl = url;
+                                    info.ExeSize = size;
+                                }
+                                else if (name.Equals("VaultForge.exe.sha256", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    info.ExeShaUrl = url;
+                                }
+                                else if (name.EndsWith(".msi", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    info.MsiUrl = url;
+                                    info.MsiSize = size;
+                                }
+                                else if (name.EndsWith(".msi.sha256", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    info.MsiShaUrl = url;
                                 }
                             }
                         }

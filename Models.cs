@@ -33,6 +33,9 @@ namespace VaultForge
         public string MsiUrl { get; set; }
         public long MsiSize { get; set; }
         public string MsiShaUrl { get; set; }
+        public string ExeUrl { get; set; }
+        public long ExeSize { get; set; }
+        public string ExeShaUrl { get; set; }
         public string Notes { get; set; }
         public string Error { get; set; }
     }

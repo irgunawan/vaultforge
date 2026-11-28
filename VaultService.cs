@@ -20,7 +20,7 @@ namespace VaultForge
 
         public string BridgeScript
         {
-            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vaultforge_bridge.ps1"); }
+            get { return PortableRuntime.BridgePath; }
         }
 
         public VaultResult AddLogin(string label, string origin, string identifierType,
@@ -87,7 +87,7 @@ namespace VaultForge
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                    WorkingDirectory = PortableRuntime.RuntimeDir,
                     StandardOutputEncoding = Encoding.UTF8,
                     StandardErrorEncoding = Encoding.UTF8
                 };

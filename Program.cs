@@ -10,6 +10,7 @@ namespace VaultForge
         private static void Main()
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+            PortableRuntime.Ensure();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

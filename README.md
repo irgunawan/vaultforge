@@ -29,7 +29,15 @@ The app auto-detects `hermes.exe` on `PATH` and uses the sibling `python.exe`.
 If auto-detection fails, open **⚙ Settings** and point it at the right
 `hermes.exe`, `python.exe`, and Hermes home directory.
 
+## Portable
+
+`VaultForge-<version>.exe` is a single-file portable build: copy it anywhere
+writable and run it. It extracts `vaultforge_bridge.ps1` and
+`vaultforge_helper.py` into a `VaultForge-data` folder beside itself and keeps
+`settings.json` there too. No installer, no registry, no admin rights.
+
 ## Build
+
 
 ```powershell
 dotnet build -c Release
@@ -40,11 +48,11 @@ The MSI is built from `installer/product.wxs`. On Windows, use WiX Toolset 3.x:
 
 ```powershell
 candle installer\product.wxs
-light -ext WixUIExtension -o VaultForge-1.0.6.msi product.wixobj
+light -ext WixUIExtension -o VaultForge-1.0.7.msi product.wixobj
 ```
 
 The checked-in `installer/product.wxs` was also built on Linux with `wixl`.
-Publish `VaultForge-1.0.6.msi.sha256` beside the MSI on GitHub Releases so OTA
+Publish `VaultForge-1.0.7.msi.sha256` beside the MSI on GitHub Releases so OTA
 can verify the download before installing.
 
 ## Security

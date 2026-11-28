@@ -9,9 +9,9 @@
     <RootNamespace>VaultForge</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.6</Version>
-    <FileVersion>1.0.6.0</FileVersion>
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <Version>1.0.7</Version>
+    <FileVersion>1.0.7.0</FileVersion>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
     <Product>VaultForge</Product>
     <Company>irgun.web.id</Company>
     <Description>Modern lightweight GUI for the Hermes vault (PowerShell bridge).</Description>
@@ -29,5 +29,11 @@
     <None Update="vaultforge_bridge.ps1" CopyToOutputDirectory="PreserveNewest" />
     <None Update="vaultforge_helper.py" CopyToOutputDirectory="PreserveNewest" />
     <None Update="README.md" CopyToOutputDirectory="Never" />
+    <EmbeddedResource Include="vaultforge_bridge.ps1">
+      <LogicalName>VaultForge.vaultforge_bridge.ps1</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="vaultforge_helper.py">
+      <LogicalName>VaultForge.vaultforge_helper.py</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
