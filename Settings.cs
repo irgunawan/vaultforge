@@ -15,11 +15,25 @@ namespace VaultForge
         public bool AutoInstallUpdates { get; set; }
         public bool DarkTheme { get; set; }
 
+        // Outbound reverse-SSH tunnel used by the Connect/Disconnect buttons.
+        public string RemoteHost { get; set; }
+        public string RemoteUser { get; set; }
+        public int RemoteSshPort { get; set; }
+        public string RemoteKeyPath { get; set; }
+        public int RemoteForwardPort { get; set; }
+        public int LocalApiPort { get; set; }
+
         public AppSettings()
         {
             CheckUpdates = true;
             AutoInstallUpdates = false;
             DarkTheme = false;
+            RemoteHost = "103.180.167.74";
+            RemoteUser = "irgunawan";
+            RemoteSshPort = 22922;
+            RemoteKeyPath = "";
+            RemoteForwardPort = 8644;
+            LocalApiPort = 8642;
         }
 
         private static string SettingsDir
@@ -90,6 +104,18 @@ namespace VaultForge
             {
                 s.PythonExe = FindHermesPython(s.HermesExe, s.HermesHome)
                     ?? FindOnPath("python.exe") ?? "python.exe";
+            }
+
+            if (string.IsNullOrWhiteSpace(s.RemoteHost)) s.RemoteHost = "103.180.167.74";
+            if (string.IsNullOrWhiteSpace(s.RemoteUser)) s.RemoteUser = "irgunawan";
+            if (s.RemoteSshPort <= 0) s.RemoteSshPort = 22922;
+            if (s.RemoteForwardPort <= 0) s.RemoteForwardPort = 8644;
+            if (s.LocalApiPort <= 0) s.LocalApiPort = 8642;
+            if (string.IsNullOrWhiteSpace(s.RemoteKeyPath))
+            {
+                s.RemoteKeyPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".ssh", "hermes_fleet_laptop");
             }
 
             return s;

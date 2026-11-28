@@ -9,7 +9,7 @@ namespace VaultForge
 {
     internal sealed class MainForm : Form
     {
-        private const string AppVersion = "1.0.7";
+        private const string AppVersion = "1.0.8";
 
         private readonly AppSettings _settings;
         private VaultService _vault;
@@ -32,6 +32,12 @@ namespace VaultForge
         private FlatButton _themeButton;
         private ProcessGaugePanel _gauges;
         private SystemIndicators _system;
+        private RemoteTunnel _remote;
+        private FlatButton _connectButton;
+        private FlatButton _disconnectButton;
+        private StatusLamp _remoteLamp;
+        private Label _remoteLabel;
+        private FlowLayoutPanel _remotePanel;
         private bool _fullscreen;
         private Rectangle _restoreBounds;
 
@@ -39,6 +45,8 @@ namespace VaultForge
         {
             _settings = AppSettings.Load();
             _vault = new VaultService(_settings);
+            _remote = new RemoteTunnel(_settings);
+            _remote.StateChanged += OnRemoteStateChanged;
             Theme.SetDark(_settings.DarkTheme);
 
             Text = "VaultForge";
@@ -49,6 +57,7 @@ namespace VaultForge
             Size = new Size(1120, 740);
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.Sizable;
+            AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             DoubleBuffered = true;
 
@@ -56,6 +65,7 @@ namespace VaultForge
             Theme.Apply(this);
             ApplyThemeExtras();
             Shown += OnShown;
+            FormClosing += OnFormClosing;
         }
 
         private void BuildUi()
@@ -200,6 +210,8 @@ namespace VaultForge
             }
             if (_gauges != null) _gauges.ApplyTheme();
             if (_system != null) _system.ApplyTheme();
+            if (_remotePanel != null) _remotePanel.BackColor = Theme.Surface2;
+            if (_remoteLabel != null) _remoteLabel.ForeColor = Theme.Muted;
         }
 
         private Control BuildFormCard()
@@ -421,9 +433,60 @@ namespace VaultForge
             };
             _checkUpdateButton.Click += (s, e) => CheckUpdates(true);
 
+            _remotePanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                WrapContents = false,
+                FlowDirection = FlowDirection.LeftToRight,
+                BackColor = Theme.Surface2,
+                Margin = Padding.Empty,
+                Padding = Padding.Empty
+            };
+
+            _connectButton = new FlatButton("Connect", Theme.Accent, Theme.AccentDark)
+            {
+                Width = 72,
+                Height = 24,
+                Margin = new Padding(0, 0, 6, 0)
+            };
+            _connectButton.Click += (s, e) => _remote.Connect();
+
+            _disconnectButton = new FlatButton("Disconnect", Theme.Surface2, Color.FromArgb(51, 65, 85))
+            {
+                Width = 88,
+                Height = 24,
+                Margin = new Padding(0, 0, 8, 0)
+            };
+            _disconnectButton.Click += (s, e) => _remote.Disconnect();
+
+            _remoteLamp = new StatusLamp
+            {
+                Margin = new Padding(0, 4, 4, 0),
+                LampColor = Color.FromArgb(150, 150, 150)
+            };
+            _remoteLabel = new Label
+            {
+                Text = "Terputus",
+                AutoSize = false,
+                Width = 78,
+                Height = 24,
+                ForeColor = Theme.Muted,
+                Font = Theme.Ui(8.5f),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Tag = "muted",
+                Margin = Padding.Empty
+            };
+
+            _remotePanel.Controls.Add(_connectButton);
+            _remotePanel.Controls.Add(_disconnectButton);
+            _remotePanel.Controls.Add(_remoteLamp);
+            _remotePanel.Controls.Add(_remoteLabel);
+
             bar.Controls.Add(_statusLabel);
             bar.Controls.Add(version);
             bar.Controls.Add(_checkUpdateButton);
+            bar.Controls.Add(_remotePanel);
             return bar;
         }
 
@@ -458,6 +521,67 @@ namespace VaultForge
             if (_settings.CheckUpdates)
             {
                 CheckUpdates(false);
+            }
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            _remote.Dispose();
+        }
+
+        private void OnRemoteStateChanged(RemoteState state, string message)
+        {
+            if (IsDisposed) return;
+            try
+            {
+                if (!IsHandleCreated || InvokeRequired)
+                {
+                    BeginInvoke((Action)(() => ApplyRemoteState(state, message)));
+                    return;
+                }
+                ApplyRemoteState(state, message);
+            }
+            catch
+            {
+            }
+        }
+
+        private void ApplyRemoteState(RemoteState state, string message)
+        {
+            if (_connectButton == null || _disconnectButton == null ||
+                _remoteLamp == null || _remoteLabel == null) return;
+
+            switch (state)
+            {
+                case RemoteState.Connected:
+                    _remoteLamp.LampColor = Color.FromArgb(0, 153, 68);
+                    _remoteLabel.Text = "Terhubung";
+                    _connectButton.Enabled = false;
+                    _disconnectButton.Enabled = true;
+                    break;
+                case RemoteState.Connecting:
+                    _remoteLamp.LampColor = Color.FromArgb(230, 160, 0);
+                    _remoteLabel.Text = "Menghubungkan";
+                    _connectButton.Enabled = false;
+                    _disconnectButton.Enabled = true;
+                    break;
+                case RemoteState.Error:
+                    _remoteLamp.LampColor = Color.FromArgb(210, 40, 40);
+                    _remoteLabel.Text = "Gagal";
+                    _connectButton.Enabled = true;
+                    _disconnectButton.Enabled = true;
+                    break;
+                default:
+                    _remoteLamp.LampColor = Color.FromArgb(150, 150, 150);
+                    _remoteLabel.Text = "Terputus";
+                    _connectButton.Enabled = true;
+                    _disconnectButton.Enabled = false;
+                    break;
+            }
+
+            if (_statusLabel != null && !string.IsNullOrEmpty(message))
+            {
+                _statusLabel.Text = message;
             }
         }
 

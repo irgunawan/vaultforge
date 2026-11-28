@@ -1,0 +1,26 @@
+VaultForge v1.0.8
+=================
+
+1) VaultForge.exe  (PORTABEL, tanpa instalasi)
+   - Dobel-klik langsung jalan. Taruh di folder yang bisa ditulis.
+   - Saat pertama jalan, folder VaultForge-data dibuat di sebelah EXE
+     (berisi bridge + helper + settings.json).
+   - Tidak perlu admin, tidak menulis registry.
+   - SHA-256 ada di VaultForge.exe.sha256
+
+2) VaultForge-Setup.exe  (INSTALASI 1x KLIK)
+   - Dobel-klik, klik "Yes" pada UAC, tunggu sebentar, aplikasi terbuka.
+   - Tidak perlu membuka PowerShell.
+   - Instal ke C:\Program Files (x86)\VaultForge
+   - SHA-256 ada di VaultForge-Setup.exe.sha256
+
+BARU di v1.0.8:
+- Tombol Connect / Disconnect + lampu status di status bar.
+- Connect membuka tunnel keluar (reverse SSH) ke server utama, jadi laptop
+  tetap bisa diakses Hermes walau di belakang router/NAT tanpa port forwarding.
+- Disconnect memutus tunnel dan menghentikan loop auto-connect.
+- Lamp: hijau = terhubung, abu-abu = terputus, oranye = menghubungkan,
+  merah = gagal.
+
+Keduanya butuh Windows 10/11 dan .NET Framework 4.8 (sudah bawaan Windows).
+MSI belum ditandatangani, jadi SmartScreen "Unknown publisher" bisa muncul.
