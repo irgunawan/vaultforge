@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="setup/**" />
+    <EmbeddedResource Remove="setup/**" />
+    <None Remove="setup/**" />
     <None Update="vaultforge_bridge.ps1" CopyToOutputDirectory="PreserveNewest" />
     <None Update="vaultforge_helper.py" CopyToOutputDirectory="PreserveNewest" />
     <None Update="README.md" CopyToOutputDirectory="Never" />

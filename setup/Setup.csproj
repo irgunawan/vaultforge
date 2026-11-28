@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>VaultForge-Setup</AssemblyName>
+    <RootNamespace>VaultForgeSetup</RootNamespace>
+    <ApplicationIcon>..\app.ico</ApplicationIcon>
+    <Version>1.0.7</Version>
+    <FileVersion>1.0.7.0</FileVersion>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <Product>VaultForge Setup</Product>
+    <Company>irgun.web.id</Company>
+    <Description>One-click installer for VaultForge.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+    <EmbeddedResource Include="..\VaultForge-1.0.7.msi">
+      <LogicalName>VaultForgeSetup.VaultForge.msi</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
